@@ -3,7 +3,7 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 const SUPABASE_URL = 'https://xdsrnnkuxfaycnlngjbq.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_AicVoQAwV-KnlOs1Fc2RuQ_T81In0MC';
 const FOUNDERS_ID = '5adc5ebc-d73e-4226-bf18-c303c038b294';
-const BUILD = '5.4-ground-texture-zombie-png';
+const BUILD = '5.5-console-difficulty-score-resume';
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
   auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
 });

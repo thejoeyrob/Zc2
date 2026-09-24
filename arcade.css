@@ -12,3 +12,23 @@ html.zs52-locked,html.zs52-locked body{overflow:hidden!important;overscroll-beha
 @media(max-width:760px){.zs52-overlay{padding:0}.zs52-shell{width:100vw;height:100dvh}.zs52-menu-box{width:94%;max-height:90%}.zs52-menu-actions,.zs52-menu-skins{grid-template-columns:1fr}.zs52-menu-skin{grid-template-columns:92px 1fr}.zs52-menu-skin img{width:92px;height:48px}.zs52-hudtop b{font-size:15px}.zs52-hudtop small,.zs52-hudbottom small{font-size:6px}.zs52-hudbottom b{font-size:11px}.zs52-lives i{font-size:11px}.zs52-ticker{left:34%;right:34%;font-size:6px}.zs52-topbtn{height:34px;font-size:7px}.zs52-topbtn span{display:none}}
 
 .zs52-portrait-warning{width:min(92vw,520px);padding:30px;border:1px solid #3a4449;border-radius:24px;background:linear-gradient(180deg,#11181b,#070a0c);text-align:center;box-shadow:0 25px 80px rgba(0,0,0,.55)}.zs52-portrait-warning img{width:86px;height:86px;border-radius:18px;display:block;margin:0 auto 16px}.zs52-portrait-warning h2{font:900 40px var(--cond);margin:8px 0}.zs52-portrait-warning p{color:#98a4aa;max-width:34ch;margin:0 auto 18px}.zs52-portrait-warning .btn{margin:auto}
+
+/* v5.5 gameplay + console cleanup overrides */
+#zs52Root,.zs52-overlay{width:100vw;max-width:100vw;overflow:hidden}
+.zs52-shell{width:100vw;max-width:min(100vw,calc(100dvh * .69));background:url('./console-shell-elite.jpg') center/100% 100% no-repeat}
+.zs52-skinwash{opacity:.22;mix-blend-mode:soft-light}
+.zs52-menu-layer{overflow-x:hidden;padding:10px;box-sizing:border-box}
+.zs52-menu-box{width:min(680px,calc(100vw - 20px));max-width:calc(100vw - 20px);overflow-x:hidden;box-sizing:border-box}
+.zs52-menu-box nav,.zs52-menu-actions,.zs52-code,.zs52-menu-skins,.zs52-instructions,.zs52-menu-board{max-width:100%}
+.zs52-menu-skins{grid-template-columns:1fr}
+.zs52-code{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center}
+.zs52-code input{min-width:0;width:100%}
+.zs52-lr button,.zs52-fire{overflow:hidden}
+.zs52-lr button::after,.zs52-fire::after{content:"";position:absolute;inset:-6px;border-radius:inherit;box-shadow:inset 0 0 0 2px rgba(0,0,0,.55),0 0 0 8px rgba(18,22,24,.92),0 0 0 10px rgba(255,255,255,.05),0 10px 16px rgba(0,0,0,.42);pointer-events:none}
+.zs52-lr button{background:linear-gradient(160deg,#4a5358 0%,#202629 34%,#090b0c 100%);border-color:rgba(235,240,242,.16)}
+.zs52-lr button:before{opacity:.12;background-size:cover}
+.zs52-lr button b{font-size:34px;text-shadow:0 2px 4px rgba(0,0,0,.6)}
+.zs52-fire{background:radial-gradient(circle at 38% 28%,#ff7a61 0%,#df3729 23%,#870f0b 59%,#260606 82%,#080202 100%)}
+.zs52-fire::after{border-radius:50%}
+.zs52-fire b{font-size:24px}
+.zs52-topbtn,.zs52-exit{background:linear-gradient(180deg,#1e2528,#090b0c)}
