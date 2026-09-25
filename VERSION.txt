@@ -1,2 +1,2 @@
-ZC2 Community Arena v5.7
+ZC2 Community Arena v5.8
 Build: visual-gameplay-account-polish

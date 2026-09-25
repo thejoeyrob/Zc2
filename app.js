@@ -3,7 +3,7 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 const SUPABASE_URL = 'https://xdsrnnkuxfaycnlngjbq.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_AicVoQAwV-KnlOs1Fc2RuQ_T81In0MC';
 const FOUNDERS_ID = '5adc5ebc-d73e-4226-bf18-c303c038b294';
-const BUILD = '5.7-visual-gameplay-account-polish';
+const BUILD = '5.8-boss-horde-story';
 const REMEMBER_EMAIL_KEY='zc2-remember-email';
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
   auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
