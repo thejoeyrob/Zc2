@@ -1,10 +1,2 @@
-ZC2 Community Arena v5.5
-GAMEPLAY + CALLS + LEAGUE RELIABILITY
-Same-repository true-flat PWA
-
-- Zombie Smash: left/right/fire only, straight-fire aiming, fixed defence line
-- Clean procedural ground textures rotate by horde cycle
-- Pickups now spawn on the movement line; speed, rapid-fire and shield added
-- Console controls rebuilt as tactile textured hardware controls
-- Arcade high scores persist with RPC + direct profile fallback and appear in League
-- Direct-call signaling now has Realtime + polling fallback and TURN relay fallback
+ZC2 Community Arena v5.7
+Build: visual-gameplay-account-polish
