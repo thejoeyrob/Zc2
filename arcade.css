@@ -15,7 +15,7 @@ html.zs52-locked,html.zs52-locked body{overflow:hidden!important;overscroll-beha
 
 /* v5.5 gameplay + console cleanup overrides */
 #zs52Root,.zs52-overlay{width:100vw;max-width:100vw;overflow:hidden}
-.zs52-shell{width:100vw;max-width:min(100vw,calc(100dvh * .69));background:url('./console-shell-elite.jpg') center/100% 100% no-repeat}
+.zs52-shell{width:100vw;max-width:min(100vw,calc(100dvh * .69))}
 .zs52-skinwash{opacity:.22;mix-blend-mode:soft-light}
 .zs52-menu-layer{overflow-x:hidden;padding:10px;box-sizing:border-box}
 .zs52-menu-box{width:min(680px,calc(100vw - 20px));max-width:calc(100vw - 20px);overflow-x:hidden;box-sizing:border-box}
@@ -37,7 +37,7 @@ html.zs52-locked,html.zs52-locked body{overflow:hidden!important;overscroll-beha
 html.zs52-locked,html.zs52-locked body{width:100%!important;height:100%!important;max-width:100%!important;overflow:hidden!important;position:fixed!important;inset:0!important;overscroll-behavior:none!important;touch-action:none!important}
 #zs52Root{position:fixed!important;inset:0!important;width:100vw!important;height:100dvh!important;max-width:100vw!important;overflow:hidden!important;overscroll-behavior:none!important}
 .zs52-overlay{position:fixed!important;inset:0!important;width:100vw!important;height:100dvh!important;overflow:hidden!important;overscroll-behavior:none!important;touch-action:none!important;background:#020304}
-.zs52-shell{position:absolute!important;top:0!important;bottom:0!important;left:50%!important;transform:translateX(-50%)!important;height:100dvh!important;width:min(100vw,calc(100dvh * .69))!important;max-width:100vw!important;background:url('./console-shell-elite.jpg') center/100% 100% no-repeat!important;overflow:hidden!important;touch-action:none!important}
+.zs52-shell{position:absolute!important;top:0!important;bottom:0!important;left:50%!important;transform:translateX(-50%)!important;height:100dvh!important;width:min(100vw,calc(100dvh * .69))!important;max-width:100vw!important;background:linear-gradient(155deg,#2a3134 0%,#181e21 40%,#0a0d0e 100%)!important;overflow:hidden!important;touch-action:none!important}
 .zs52-skinwash{inset:0!important;background-size:100% 100%!important;background-repeat:no-repeat!important;background-position:center!important;opacity:.56!important;mix-blend-mode:soft-light!important;filter:none!important}
 .skin-neon .zs52-skinwash,.skin-hazard .zs52-skinwash,.skin-jacko .zs52-skinwash,.skin-milspec .zs52-skinwash,.skin-arcade .zs52-skinwash,.skin-blood .zs52-skinwash,.skin-toxic .zs52-skinwash,.skin-gold .zs52-skinwash,.skin-founders .zs52-skinwash,.skin-phantom .zs52-skinwash{opacity:.58!important;filter:none!important;animation:none!important}
 .zs52-screen{left:5.2%!important;right:5.2%!important;top:5.4%!important;height:66.4%!important;border-radius:20px!important;background:#161918!important;box-shadow:0 0 0 3px rgba(0,0,0,.82),0 0 0 5px rgba(134,141,145,.24),inset 0 0 0 2px rgba(255,255,255,.04),0 12px 34px rgba(0,0,0,.5)!important}
@@ -90,3 +90,26 @@ body.zs52-playing .notifications-drawer{
 #zs52Root .zs52-shell{
   z-index:1!important;
 }
+
+/* v5.9 — visual redesign: console chrome + button legibility (buttons only, no new images) */
+.zs52-arrow{display:block;width:0;height:0;border-top:11px solid transparent;border-bottom:11px solid transparent;border-right:16px solid #f0f3f4;filter:drop-shadow(0 2px 2px rgba(0,0,0,.55));margin:0 auto;transition:border-color .08s}
+.zs52-lr button.right .zs52-arrow{border-right:none;border-left:16px solid #f0f3f4}
+.zs52-lr button{gap:6px!important}
+.zs52-lr button.pressed .zs52-arrow{border-right-color:#f4d729}
+.zs52-lr button.right.pressed .zs52-arrow{border-left-color:#f4d729}
+
+.zs52-topbtn{gap:4px!important}
+.zs52-topbtn.menu{background:linear-gradient(180deg,#343b3e,#12171a)!important;border-color:#6a747a!important}
+.zs52-topbtn.pause{background:linear-gradient(180deg,#3c331d,#181206)!important;border-color:#a08a2c!important}
+.zs52-topbtn.pause .material-symbols-rounded{color:#f4d729!important}
+.zs52-topbtn.menu .material-symbols-rounded{color:#dfe5e7!important}
+.zs52-topbtn:active{transform:translateY(1px)}
+
+.zs52-exit{width:auto!important;height:32px!important;min-width:32px!important;padding:0 10px!important;border-radius:9px!important;gap:4px!important;background:linear-gradient(180deg,#3d201f,#180b0a)!important;border:1px solid #7a3532!important;flex-direction:row!important}
+.zs52-exit .material-symbols-rounded{font-size:16px!important;color:#ff9a92!important}
+.zs52-exit small{font:800 8px var(--body);letter-spacing:.1em;color:#ffbdb7}
+.zs52-exit:active{transform:translateY(1px)}
+
+.zs52-fire .material-symbols-rounded{filter:drop-shadow(0 0 6px rgba(255,200,120,.5))}
+
+@media(max-width:760px){.zs52-exit small{display:none!important}.zs52-exit{width:32px!important;min-width:32px!important;padding:0!important;border-radius:50%!important;justify-content:center!important}.zs52-arrow{border-top-width:9px;border-bottom-width:9px;border-right-width:13px}.zs52-lr button.right .zs52-arrow{border-left-width:13px}}
