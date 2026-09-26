@@ -1,0 +1,717 @@
+{
+  "package": "ZC2 Community Arena v5.9.0 Mini Battle Production PWA",
+  "assetCount": 81,
+  "orientation": "portrait; player north/up, enemies south/down",
+  "assets": [
+    {
+      "file": "boss-debo-stage1.png",
+      "bytes": 153477,
+      "sha256": "2fb23a04c0bf52daac04c11a4d5741e4b77ca3474b590cf13718a669216c29a2",
+      "width": 1024,
+      "height": 1024,
+      "mode": "P",
+      "alpha": true
+    },
+    {
+      "file": "boss-debo-stage2.png",
+      "bytes": 219383,
+      "sha256": "3168b2bacd3287d787dfa5c6b6c6da68161997b54020c64a34da293c600211b8",
+      "width": 1024,
+      "height": 1024,
+      "mode": "P",
+      "alpha": true
+    },
+    {
+      "file": "boss-drmantis-stage1.png",
+      "bytes": 189035,
+      "sha256": "2bf874ebd8cf1fa617925d6c913c342fb9b245b1797e109ef26b3a8dba65d9a3",
+      "width": 1024,
+      "height": 1024,
+      "mode": "P",
+      "alpha": true
+    },
+    {
+      "file": "boss-drmantis-stage2.png",
+      "bytes": 249494,
+      "sha256": "71774683c8cfdf1f253cdd89a65bd60bdc41c4b087d837504710cca70cabd54d",
+      "width": 1024,
+      "height": 1024,
+      "mode": "P",
+      "alpha": true
+    },
+    {
+      "file": "boss-drmantis-stage3.png",
+      "bytes": 241433,
+      "sha256": "6412dc82c7aa03de29fbad49c30a040542ca09e25bec040e197c78557540d633",
+      "width": 1024,
+      "height": 1024,
+      "mode": "P",
+      "alpha": true
+    },
+    {
+      "file": "boss-fatamy-stage1.png",
+      "bytes": 139186,
+      "sha256": "aed83b492147c320494ef8c991eec1963ec1b660bb1be567bd2a3cf690c8e3d5",
+      "width": 1024,
+      "height": 1024,
+      "mode": "P",
+      "alpha": true
+    },
+    {
+      "file": "boss-fatamy-stage2.png",
+      "bytes": 199329,
+      "sha256": "a2833c987c34294143f2b4733a4261d0291a754b1a8c7116983d1dc2363f0bed",
+      "width": 1024,
+      "height": 1024,
+      "mode": "P",
+      "alpha": true
+    },
+    {
+      "file": "boss-fatamy-stage3.png",
+      "bytes": 235183,
+      "sha256": "3f4efa36b09d3c6fdeb1bc3fbff7f090d766b31c03f834637f1525e56531a12e",
+      "width": 1024,
+      "height": 1024,
+      "mode": "P",
+      "alpha": true
+    },
+    {
+      "file": "boss-glowinghumanity-stage1.png",
+      "bytes": 184356,
+      "sha256": "c61b9870f658c5b06225dba4febbdd1c408ab012be75ab177cc00328d11761c9",
+      "width": 1024,
+      "height": 1024,
+      "mode": "P",
+      "alpha": true
+    },
+    {
+      "file": "boss-glowinghumanity-stage2.png",
+      "bytes": 200817,
+      "sha256": "8cb05f58d61b42cf100eb65796886aab6d5b4a5baa21029d7d9cd9f951618eca",
+      "width": 1024,
+      "height": 1024,
+      "mode": "P",
+      "alpha": true
+    },
+    {
+      "file": "boss-jordan-stage1.png",
+      "bytes": 179675,
+      "sha256": "cb06f528048aa741917fee02d979ae76ce524749f86f4d71e5984ef0deecfcfb",
+      "width": 1024,
+      "height": 1024,
+      "mode": "P",
+      "alpha": true
+    },
+    {
+      "file": "boss-jordan-stage2.png",
+      "bytes": 263120,
+      "sha256": "e309535f6f483da6e85ccba5b678e4178aaa5c83a994796bb1f1c3f80dfdcc3e",
+      "width": 1024,
+      "height": 1024,
+      "mode": "P",
+      "alpha": true
+    },
+    {
+      "file": "bullet-dmr.png",
+      "bytes": 26245,
+      "sha256": "d411bd09cb8b98c7ca7047da3d7245108d089f10bff7dd75b15049c57c272241",
+      "width": 512,
+      "height": 512,
+      "mode": "P",
+      "alpha": true
+    },
+    {
+      "file": "bullet-pistol.png",
+      "bytes": 26111,
+      "sha256": "e65eef88ff33ee61295212dfd317be58e8a1a32dee2fcae79c178d0df4eec79c",
+      "width": 512,
+      "height": 512,
+      "mode": "P",
+      "alpha": true
+    },
+    {
+      "file": "bullet-smg.png",
+      "bytes": 26134,
+      "sha256": "2718a190602ed94dd72d75c16854d3a636990268422f7df282862b1475c4d77f",
+      "width": 512,
+      "height": 512,
+      "mode": "P",
+      "alpha": true
+    },
+    {
+      "file": "console-shell-elite.jpg",
+      "bytes": 166591,
+      "sha256": "2002f82e9cba247bf3953fd1bb4799d37bd7aad78d989c1fa999f36098373938",
+      "width": 1024,
+      "height": 1024,
+      "mode": "RGB"
+    },
+    {
+      "file": "console-shell-premium.jpg",
+      "bytes": 227700,
+      "sha256": "bd606b84eb4b4e15556886df81fb4cb6f3fd04f60a660a45e9ba5d2803d2f4a3",
+      "width": 1024,
+      "height": 1024,
+      "mode": "RGB"
+    },
+    {
+      "file": "control-back.png",
+      "bytes": 36552,
+      "sha256": "effe0fd6b9a66256576138c3d19d2817b72eaa5559c8df1f6c5d945946786487",
+      "width": 512,
+      "height": 512,
+      "mode": "P",
+      "alpha": true
+    },
+    {
+      "file": "control-dpad.png",
+      "bytes": 47593,
+      "sha256": "86a975c4fa71a08befe0b33f0198359160e1af0c6a4f09b02f6e6a8ac82fdab5",
+      "width": 512,
+      "height": 512,
+      "mode": "P",
+      "alpha": true
+    },
+    {
+      "file": "control-fire.png",
+      "bytes": 61513,
+      "sha256": "14ce7abd3cb30396b0b94af2e432caf2382cfcac627f7b882a6f6a2a78dba2b6",
+      "width": 512,
+      "height": 512,
+      "mode": "P",
+      "alpha": true
+    },
+    {
+      "file": "control-joystick.png",
+      "bytes": 54161,
+      "sha256": "01aaa231d9058f5f5a4e1bab93a5dd550dd5547a62ce37a246e3c681da0e1e03",
+      "width": 512,
+      "height": 512,
+      "mode": "P",
+      "alpha": true
+    },
+    {
+      "file": "control-left.png",
+      "bytes": 79730,
+      "sha256": "afa29aa046fb982e3dd2d6e4ee297322291892148d9444330dc144c52174d589",
+      "width": 512,
+      "height": 512,
+      "mode": "P",
+      "alpha": true
+    },
+    {
+      "file": "control-menu.png",
+      "bytes": 35608,
+      "sha256": "2fe0e5fb06d109c196395076977425048c3fa882291b62ce2334618e7b8c05b8",
+      "width": 512,
+      "height": 512,
+      "mode": "P",
+      "alpha": true
+    },
+    {
+      "file": "control-pause.png",
+      "bytes": 39022,
+      "sha256": "b31dc88484d6df6c0b186783d3fc69fdc8ce62aa00de74f01588aced79fe9efb",
+      "width": 512,
+      "height": 512,
+      "mode": "P",
+      "alpha": true
+    },
+    {
+      "file": "control-right.png",
+      "bytes": 77580,
+      "sha256": "8d0e81d3120b91ac1c7cbee2c854aa5d8987e74a52207ba7648f5b33ac86b638",
+      "width": 512,
+      "height": 512,
+      "mode": "P",
+      "alpha": true
+    },
+    {
+      "file": "frame-dialog.png",
+      "bytes": 72345,
+      "sha256": "d014fc6fd050b2bd7a2ee6f7feaf67352a8dd306de443fd9eee88b61abf2558f",
+      "width": 1024,
+      "height": 512,
+      "mode": "P",
+      "alpha": true
+    },
+    {
+      "file": "frame-screen.png",
+      "bytes": 59634,
+      "sha256": "b0d7f932a318379f3682bc2e3c9e46e28759d7da063155b74a3cdd60431c9628",
+      "width": 1024,
+      "height": 512,
+      "mode": "P",
+      "alpha": true
+    },
+    {
+      "file": "frame-statusbar.png",
+      "bytes": 31329,
+      "sha256": "32cead5467761e6431fb8c8fd84c3b4c0e16577fa532a34f4ebd841a7549d5a3",
+      "width": 1024,
+      "height": 256,
+      "mode": "P",
+      "alpha": true
+    },
+    {
+      "file": "frame-weapons.png",
+      "bytes": 52946,
+      "sha256": "361ba77fa43b99e15da6409d74af27ea4bf909e8392b0f653eaa8ee846295385",
+      "width": 1024,
+      "height": 384,
+      "mode": "P",
+      "alpha": true
+    },
+    {
+      "file": "fx-muzzle.png",
+      "bytes": 32440,
+      "sha256": "64c6d2324cd924cdce8f51149e3fc7cd359129c146fe487af80b7548eb8ce3da",
+      "width": 512,
+      "height": 512,
+      "mode": "P",
+      "alpha": true
+    },
+    {
+      "file": "hud-boss-warning.png",
+      "bytes": 38612,
+      "sha256": "078ebd05b834480af580aa02b22f5fd1e4027d879ceeb002c446a7035e7b876d",
+      "width": 512,
+      "height": 512,
+      "mode": "P",
+      "alpha": true
+    },
+    {
+      "file": "hud-energy-fill.png",
+      "bytes": 15878,
+      "sha256": "4944458d410537fd347e32b38727be50f80af18a925915d4640c45fd9dfa42c7",
+      "width": 512,
+      "height": 256,
+      "mode": "P",
+      "alpha": true
+    },
+    {
+      "file": "hud-energy-frame.png",
+      "bytes": 26922,
+      "sha256": "3dca3d1264d16a52a98ee8f4a5be1f770f36af9a6e3e66618f0175250b8268d2",
+      "width": 1024,
+      "height": 256,
+      "mode": "P",
+      "alpha": true
+    },
+    {
+      "file": "hud-life-emblem.png",
+      "bytes": 26791,
+      "sha256": "cce9ad94cc49a2725f105b3312c86a9758d3be81ca1449b4cc1bccc5c3a4c282",
+      "width": 512,
+      "height": 512,
+      "mode": "P",
+      "alpha": true
+    },
+    {
+      "file": "item-helmet.png",
+      "bytes": 16803,
+      "sha256": "301bb727b3fdafee82f553a8823da5ce3d1e6f823ca3a8d1ebc6244b370acff7",
+      "width": 512,
+      "height": 512,
+      "mode": "P",
+      "alpha": true
+    },
+    {
+      "file": "map-concrete.jpg",
+      "bytes": 475016,
+      "sha256": "8c4baabd656600a9a224e94c3f5e9bbb025a7299895eaa2778a825b00ae19624",
+      "width": 1920,
+      "height": 1080,
+      "mode": "RGB"
+    },
+    {
+      "file": "map-desert.jpg",
+      "bytes": 629018,
+      "sha256": "1161343f3dbb9d931b64be987c24852e1ec5a41264449e6585fbdbf9440f5176",
+      "width": 1920,
+      "height": 1080,
+      "mode": "RGB"
+    },
+    {
+      "file": "map-hangar.jpg",
+      "bytes": 533812,
+      "sha256": "f4acd2b4d646ad7242578baf9b2d781c1c7c7a2a213497cfe6d76fd4777a649e",
+      "width": 1920,
+      "height": 1080,
+      "mode": "RGB"
+    },
+    {
+      "file": "map-north.jpg",
+      "bytes": 639701,
+      "sha256": "cd9ab72fe5244d2e4211a32c6812261d1381d13908c54475da560422d9fefbde",
+      "width": 1920,
+      "height": 1080,
+      "mode": "RGB"
+    },
+    {
+      "file": "map-wasteland.jpg",
+      "bytes": 569591,
+      "sha256": "8c802f18f1d46374157cd2c8e179ec1c0fa928ef98e2c11f9db43fcc40d0f54b",
+      "width": 1920,
+      "height": 1080,
+      "mode": "RGB"
+    },
+    {
+      "file": "pickup-bomb.png",
+      "bytes": 31567,
+      "sha256": "064f540519cf4833dc5b70cf452220d7d8558aef431b7a7d3e5246f5c693ec2b",
+      "width": 512,
+      "height": 512,
+      "mode": "P",
+      "alpha": true
+    },
+    {
+      "file": "pickup-clock.png",
+      "bytes": 50675,
+      "sha256": "b4dde419ac1dbe200756b9912ce6656da3b35b66c0513313fc61fc88c2269ce8",
+      "width": 512,
+      "height": 512,
+      "mode": "P",
+      "alpha": true
+    },
+    {
+      "file": "pickup-dmr.png",
+      "bytes": 18400,
+      "sha256": "1e81ca80822401514e0353340fa797fc963febdfc34be8d9dbffb276f2dde70a",
+      "width": 512,
+      "height": 512,
+      "mode": "P",
+      "alpha": true
+    },
+    {
+      "file": "pickup-heart.png",
+      "bytes": 26446,
+      "sha256": "fca31eeb5e3df31364aab0c36edc3f6d979a622ac09c266d627735429451fea1",
+      "width": 512,
+      "height": 512,
+      "mode": "P",
+      "alpha": true
+    },
+    {
+      "file": "pickup-shield.png",
+      "bytes": 48043,
+      "sha256": "2b2a6acc3ff8311623e7bee9c761e697f4951d81215005b0514da6f5b1676023",
+      "width": 512,
+      "height": 512,
+      "mode": "P",
+      "alpha": true
+    },
+    {
+      "file": "pickup-smg.png",
+      "bytes": 23546,
+      "sha256": "998af07cb06df22ac9020df1159c8897583242689bdad8d9d2c4f70b7917e25a",
+      "width": 512,
+      "height": 512,
+      "mode": "P",
+      "alpha": true
+    },
+    {
+      "file": "pickup-speed.png",
+      "bytes": 52674,
+      "sha256": "c6cea5e00e73e78dec5e812052575ef2e247ab792c4fff8db44f1c6d5554f800",
+      "width": 512,
+      "height": 512,
+      "mode": "P",
+      "alpha": true
+    },
+    {
+      "file": "player-dmr.png",
+      "bytes": 26853,
+      "sha256": "7321076b58b8fba52f87bf14dc7d5d85a8656bd75c42061054a554ae3ceee325",
+      "width": 512,
+      "height": 512,
+      "mode": "P",
+      "alpha": true
+    },
+    {
+      "file": "player-fire.png",
+      "bytes": 29181,
+      "sha256": "b99f9bb956459cdb131f3671162b808e73da59f708236270690574eeb40f182e",
+      "width": 512,
+      "height": 512,
+      "mode": "P",
+      "alpha": true
+    },
+    {
+      "file": "player-hit.png",
+      "bytes": 34022,
+      "sha256": "1faba18848f507a885061f88f0ecb5d59adc40465eb701277c35deafe2e1a627",
+      "width": 512,
+      "height": 512,
+      "mode": "P",
+      "alpha": true
+    },
+    {
+      "file": "player-portrait.png",
+      "bytes": 42515,
+      "sha256": "e0fc13411e4546b001ae54daad7aa5648d83e4a54fde0afa6050b4b9270a212f",
+      "width": 512,
+      "height": 512,
+      "mode": "P",
+      "alpha": true
+    },
+    {
+      "file": "player-rapid.png",
+      "bytes": 33077,
+      "sha256": "31a67f480c4a30d2e362a491592a41b35c1dab1ab31e834ac41bca18c19797bc",
+      "width": 512,
+      "height": 512,
+      "mode": "P",
+      "alpha": true
+    },
+    {
+      "file": "player-reaction.png",
+      "bytes": 53440,
+      "sha256": "76a674746c6b0de31b008c76da32f90e33812f02ce423d24ad7d38c66a841a53",
+      "width": 512,
+      "height": 512,
+      "mode": "P",
+      "alpha": true
+    },
+    {
+      "file": "player-shield.png",
+      "bytes": 57646,
+      "sha256": "1d7c925b4e5b3648951edef9d43defbebbe86b18fb8c3d75a321cc0cb4137557",
+      "width": 512,
+      "height": 512,
+      "mode": "P",
+      "alpha": true
+    },
+    {
+      "file": "player-transparent.png",
+      "bytes": 29929,
+      "sha256": "abe313ebad89ebf516513d9fd47b9aa8a66ae0cab61c63a11693f77cc479f1c8",
+      "width": 512,
+      "height": 512,
+      "mode": "P",
+      "alpha": true
+    },
+    {
+      "file": "player-victory.png",
+      "bytes": 46653,
+      "sha256": "43c5a71c5edb50bce23c972e80b645f19ab3e4d6cc246702a8b5f067e12d22fc",
+      "width": 512,
+      "height": 512,
+      "mode": "P",
+      "alpha": true
+    },
+    {
+      "file": "player-wounded.png",
+      "bytes": 56240,
+      "sha256": "26775be0b1f58f0c3729fd63dcd0b8b370b0f00fe5780f1804b7f4043c9e6633",
+      "width": 512,
+      "height": 512,
+      "mode": "P",
+      "alpha": true
+    },
+    {
+      "file": "skin-arcade.jpg",
+      "bytes": 180656,
+      "sha256": "00d6d2037bd318320904ad90ae14a7d6a42ad43aeb6a3555e63861b44faa796d",
+      "width": 1024,
+      "height": 1024,
+      "mode": "RGB"
+    },
+    {
+      "file": "skin-blood.jpg",
+      "bytes": 197373,
+      "sha256": "d61edc8f87b84d8a7dd5fa9f46d119590101115e10a41db7bce16a4101eab0db",
+      "width": 1024,
+      "height": 1024,
+      "mode": "RGB"
+    },
+    {
+      "file": "skin-founders.jpg",
+      "bytes": 179653,
+      "sha256": "91ae7dd002ee569394febe52b814478428af37d390865d92887aa92469b0c7b8",
+      "width": 1024,
+      "height": 1024,
+      "mode": "RGB"
+    },
+    {
+      "file": "skin-gold.jpg",
+      "bytes": 255609,
+      "sha256": "0a943e6a479cdfb2b7839c4d47e88b6dffd453010c1485ca7f191ce1c7d7e45b",
+      "width": 1024,
+      "height": 1024,
+      "mode": "RGB"
+    },
+    {
+      "file": "skin-gunmetal.jpg",
+      "bytes": 199843,
+      "sha256": "27c629b5193bd0ccdc1ae854f8969cb201c459fb2b388743507d445461341bca",
+      "width": 1024,
+      "height": 1024,
+      "mode": "RGB"
+    },
+    {
+      "file": "skin-hazard.jpg",
+      "bytes": 247011,
+      "sha256": "53e47c55c16b4830224ad5be3653c05231c8d828da76d9079694ac67f7b44fad",
+      "width": 1024,
+      "height": 1024,
+      "mode": "RGB"
+    },
+    {
+      "file": "skin-jacko.jpg",
+      "bytes": 234118,
+      "sha256": "b61ab4fd9ee79bf4e8601dd6a03a372709a3af06cff5d57ef61c11a6a60b07bb",
+      "width": 1024,
+      "height": 1024,
+      "mode": "RGB"
+    },
+    {
+      "file": "skin-milspec.jpg",
+      "bytes": 205820,
+      "sha256": "c8698d494dcca01f8134a75172e6ce3400378eb15854b3f62fa469593ec3634c",
+      "width": 1024,
+      "height": 1024,
+      "mode": "RGB"
+    },
+    {
+      "file": "skin-neon.jpg",
+      "bytes": 210175,
+      "sha256": "c07080d14b804f25c390aa4d5c1c03355602281965352d703885b9743b27cd43",
+      "width": 1024,
+      "height": 1024,
+      "mode": "RGB"
+    },
+    {
+      "file": "skin-phantom.jpg",
+      "bytes": 184047,
+      "sha256": "af6b41d3af5d776e6eedea73aad245eb0e924bed214d166a1bc801eec00bf4c1",
+      "width": 1024,
+      "height": 1024,
+      "mode": "RGB"
+    },
+    {
+      "file": "skin-premium.jpg",
+      "bytes": 227700,
+      "sha256": "bd606b84eb4b4e15556886df81fb4cb6f3fd04f60a660a45e9ba5d2803d2f4a3",
+      "width": 1024,
+      "height": 1024,
+      "mode": "RGB"
+    },
+    {
+      "file": "skin-toxic.jpg",
+      "bytes": 239453,
+      "sha256": "3887643f003ff313b9aeb2c9d6811c04a96da45b3f8cb2ac702bc8bdb2fd9926",
+      "width": 1024,
+      "height": 1024,
+      "mode": "RGB"
+    },
+    {
+      "file": "war-stain-1.png",
+      "bytes": 415061,
+      "sha256": "b47d7c7cadf608fddbb6e16eaaa40561e562e967e16bbe2f8ca7ba05bde1bff4",
+      "width": 1920,
+      "height": 1080,
+      "mode": "P",
+      "alpha": true
+    },
+    {
+      "file": "war-stain-2.png",
+      "bytes": 695341,
+      "sha256": "95fcae5f771b6277d69609064c35be15166019f7a60fae3be9ca8348e6433222",
+      "width": 1920,
+      "height": 1080,
+      "mode": "P",
+      "alpha": true
+    },
+    {
+      "file": "war-stain-3.png",
+      "bytes": 746799,
+      "sha256": "ea5aae4b70b3e4ecf2a272b1354f9da9ae5d200035466cd6192ba912578c5306",
+      "width": 1920,
+      "height": 1080,
+      "mode": "P",
+      "alpha": true
+    },
+    {
+      "file": "war-stain-4.png",
+      "bytes": 780116,
+      "sha256": "e23359735e07f68367eaf40ef8026f5f12e4ec5a0cf46624b7743993d6773ed7",
+      "width": 1920,
+      "height": 1080,
+      "mode": "P",
+      "alpha": true
+    },
+    {
+      "file": "zombie-armored.png",
+      "bytes": 55741,
+      "sha256": "3807b1d77eefd91f40d25805ec4ad31a81dc6cab3327acb1497fdf50b044c32f",
+      "width": 512,
+      "height": 512,
+      "mode": "P",
+      "alpha": true
+    },
+    {
+      "file": "zombie-berserker.png",
+      "bytes": 57382,
+      "sha256": "a4842edccd78ca503f5cb25b08ac1c100cc28efbf9ca3d7e43540f2316690a45",
+      "width": 512,
+      "height": 512,
+      "mode": "P",
+      "alpha": true
+    },
+    {
+      "file": "zombie-brute.png",
+      "bytes": 70233,
+      "sha256": "208ef77f865abb39f2e6719ef74863e19f0a68d314f33f77dccd4e7e35b614dc",
+      "width": 512,
+      "height": 512,
+      "mode": "P",
+      "alpha": true
+    },
+    {
+      "file": "zombie-helmet.png",
+      "bytes": 50369,
+      "sha256": "a5df9e1c670779198d8ccff6fe4f2c28804ea3df0e7d64e6a7414104d08fbd02",
+      "width": 512,
+      "height": 512,
+      "mode": "P",
+      "alpha": true
+    },
+    {
+      "file": "zombie-normal.png",
+      "bytes": 43642,
+      "sha256": "4861e6e59045861716dac33eb7fde53e9142cbaef29206365bbeabf5d14e3946",
+      "width": 512,
+      "height": 512,
+      "mode": "P",
+      "alpha": true
+    },
+    {
+      "file": "zombie-runner.png",
+      "bytes": 44523,
+      "sha256": "a6459e307cfd1cc19e3bc3aa418b816c51a69485c4e5635ec4737c35ef26a05b",
+      "width": 512,
+      "height": 512,
+      "mode": "P",
+      "alpha": true
+    },
+    {
+      "file": "zombie-titan.png",
+      "bytes": 78753,
+      "sha256": "7e4eb68b183d6514b0db2f859d004379c4c92e8551fa0fdeb2e8571a60383b7b",
+      "width": 512,
+      "height": 512,
+      "mode": "P",
+      "alpha": true
+    },
+    {
+      "file": "zombie-toxic.png",
+      "bytes": 59493,
+      "sha256": "553f92690fb61ec95445b80a08d119dc46d3c9c481f64fac37f6b150ab3af1b6",
+      "width": 512,
+      "height": 512,
+      "mode": "P",
+      "alpha": true
+    }
+  ]
+}
