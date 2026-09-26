@@ -5,6 +5,7 @@
 @font-face{font-family:"Barlow Condensed";font-style:normal;font-weight:900;font-display:swap;src:url("./font-barlow-condensed-900.woff2") format("woff2")}
 @font-face{font-family:"Inter";font-style:normal;font-weight:400 800;font-display:swap;src:url("./font-inter.woff2") format("woff2")}
 @font-face{font-family:"Material Symbols Rounded";font-style:normal;font-weight:400;font-display:swap;src:url("./font-material-symbols-rounded.woff2") format("woff2")}
+@font-face{font-family:"Nosifer";font-style:normal;font-weight:400;font-display:swap;src:url("./font-nosifer-400.woff2") format("woff2")}
 :root{
   --bg:#080b0d;--bg2:#0d1215;--panel:#10161a;--panel2:#141b1f;--line:#293238;--line2:#3a4449;
   --text:#f2f4f5;--muted:#8e999e;--yellow:#f2d51f;--yellow2:#ffe83e;--danger:#e15c55;--ok:#8db24a;

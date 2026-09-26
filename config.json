@@ -4,7 +4,7 @@
   "backendStatus": "configured-and-hardened",
   "auth": "email/password + pre-wired Google, Apple, Discord and X OAuth; providers activate when configured in Supabase",
   "adminCode": "configured server-side; not stored in this file",
-  "build": "5.10.1-game-updates-only-patch",
+  "build": "5.11.0-boss-cinematic-overhaul",
   "hosting": "Vercel-ready static PWA; Supabase is the shared backend",
   "artwork": [
     "community-arena-main.png",
@@ -51,7 +51,8 @@
       "Desert Dust",
       "North Assault",
       "Hangar",
-      "Wasteland"
+      "Wasteland",
+      "Caffeinated Death 2"
     ],
     "admin_skins": "all while admin code session is active",
     "aiming": "straight forward only; no auto aim"
