@@ -21,7 +21,7 @@ const PICKUP_SPRITES={heart:'pickup-heart.png',clock:'pickup-clock.png',speed:'p
 const BULLET_SPRITES={pistol:'bullet-pistol.png',smg:'bullet-smg.png',dmr:'bullet-dmr.png'};
 const STAIN_SPRITES={1:'war-stain-1.png',2:'war-stain-2.png',3:'war-stain-3.png',4:'war-stain-4.png'};
 const BOSS_DEFS=[
- {id:'fatamy',name:'FAT AMY',title:'BRAINWASHED BRUISER',threshold:8000,type:'brute',hp:42,speed:13,points:5000,scale:1.26,stages:3,sprites:['boss-fatamy-stage1.png','boss-fatamy-stage2.png','boss-fatamy-stage3.png'],
+ {id:'fatamy',name:'FAT AMY',title:'BRAINWASHED BRUISER',threshold:68000,type:'brute',hp:88,speed:13,points:12500,scale:1.42,stages:3,sprites:['boss-fatamy-stage1.png','boss-fatamy-stage2.png','boss-fatamy-stage3.png'],
   tease:'Fat Amy: "Come here... my little crumpet."',announce:'OMG... is that FAT AMY?!',react:'Mantis has turned Amy into a tank.',
   stageLines:['Amy is changing...','She is getting bigger. Keep firing!','Final form. Do not let her through!'],
   finalLine:'Amy: "Enough... I remember who I am."',victory:'Joey Rob: "That is one of Mantis\'s experiments stopped."',playerLoss:'Fat Amy: "Hmmm... I love the taste of that little crumpet."'},
@@ -33,11 +33,11 @@ const BOSS_DEFS=[
   tease:'Joey better tuck that chain in... here come Debo.',announce:'DEBO?! This just got serious.',react:'That armour is not decorative.',
   stageLines:['Debo is still coming!','Armour cracked. Keep the pressure on!'],
   finalLine:'Debo: "Armour cracked... finally."',victory:'Joey Rob: "Big man is down. Keep moving."',playerLoss:'Debo: "Who else want some Debo?"'},
- {id:'jordan',name:'JORDAN',title:'FALLEN FIREFIGHTER',threshold:55000,type:'berserker',hp:74,speed:16,points:10000,scale:1.34,stages:2,sprites:['boss-jordan-stage1.png','boss-jordan-stage2.png'],
+ {id:'jordan',name:'JORDAN',title:'FALLEN FIREFIGHTER',threshold:8000,type:'berserker',hp:42,speed:13,points:5000,scale:1.26,stages:2,sprites:['boss-jordan-stage1.png','boss-jordan-stage2.png'],
   tease:'Jordan: "Everything burns eventually."',announce:'JORDAN?! Mantis got to him too.',react:'He is burning through the line.',
   stageLines:['The fire is spreading!','Jordan is fully ignited!'],
   finalLine:'Jordan: "Tell them... I held the line."',victory:'Joey Rob: "You did. Mantis is next."',playerLoss:'Jordan: "You should\'ve brought a hose."'},
- {id:'caffeinatedsloth',name:'CAFFEINATED SLOTH',title:'OVERCAFFEINATED TEST SUBJECT',threshold:68000,type:'brute',hp:88,speed:13,points:12500,scale:1.42,stages:2,sprites:['boss-caffeinatedsloth-stage1.png','boss-caffeinatedsloth-stage2.png'],
+ {id:'caffeinatedsloth',name:'CAFFEINATED SLOTH',title:'OVERCAFFEINATED TEST SUBJECT',threshold:55000,type:'brute',hp:74,speed:16,points:10000,scale:1.34,stages:2,sprites:['boss-caffeinatedsloth-stage1.png','boss-caffeinatedsloth-stage2.png'],
   tease:'Caffeinated Sloth: "One coffee... isn\'t enough."',announce:'Is that CAFFEINATED SLOTH?!',react:'A zombie sloth should not be moving that fast.',
   stageLines:['The caffeine is kicking in!','Full frenzy. Keep firing!'],
   finalLine:'Caffeinated Sloth: "Need... one... more... coffee..."',victory:'Joey Rob: "That was not slow at all."',playerLoss:'Caffeinated Sloth: "Decaf? Never. You\'re slower than me."'},
