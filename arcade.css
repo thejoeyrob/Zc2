@@ -116,7 +116,7 @@ body.zs52-playing .notifications-drawer{
 /* Maximise the play area now that the console frame overlay is gone, and lift the
    MOVE/FIRE controls off the very bottom edge instead of leaving a dead gap above them. */
 .zs52-screen{left:2%!important;right:2%!important;top:9.5%!important;height:65%!important}
-.zs52-move-zone{left:4%!important;right:auto!important;bottom:9%!important;width:44%!important;height:16%!important}
+.zs52-move-zone{left:4%!important;right:auto!important;bottom:6%!important;width:44%!important;height:16%!important}
 .zs52-move-zone.flipped{left:auto!important;right:4%!important}
-.zs52-fire{right:5%!important;left:auto!important;bottom:9%!important;width:32%!important}
+.zs52-fire{right:5%!important;left:auto!important;bottom:6%!important;width:32%!important}
 .zs52-fire.flipped{right:auto!important;left:5%!important}
