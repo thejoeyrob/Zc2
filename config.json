@@ -4,7 +4,7 @@
   "backendStatus": "configured-and-hardened",
   "auth": "email/password + pre-wired Google, Apple, Discord and X OAuth; providers activate when configured in Supabase",
   "adminCode": "configured server-side; not stored in this file",
-  "build": "5.9.0-mini-battle-art-boss-staging",
+  "build": "5.10.1-game-updates-only-patch",
   "hosting": "Vercel-ready static PWA; Supabase is the shared backend",
   "artwork": [
     "community-arena-main.png",
