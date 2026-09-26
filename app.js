@@ -3,7 +3,7 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 const SUPABASE_URL = 'https://xdsrnnkuxfaycnlngjbq.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_AicVoQAwV-KnlOs1Fc2RuQ_T81In0MC';
 const FOUNDERS_ID = '5adc5ebc-d73e-4226-bf18-c303c038b294';
-const BUILD = '5.10.1-material-shell-asset-qc';
+const BUILD = '5.13.0-auth-gate-social-login';
 const REMEMBER_EMAIL_KEY='zc2-remember-email';
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
   auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
@@ -214,9 +214,16 @@ async function handlePendingInvite(){
 
 function render(){
   if(!isStandalone()&&!previewMode()){renderInstallGate();return;}
+  if(!state.session){if(!state.modal||state.modal.type!=='auth')state.modal={type:'auth',mode:state.authRecovery?'recovery':'signin'};renderAuthGate();return;}
   const app=$('#app');app.className='';
   app.innerHTML=`<div class="shell">${topbarHtml()}<div class="layout">${sidebarHtml()}<main class="main" id="main">${pageHtml()}</main></div></div>${drawerHtml()}${modalHtml()}${introHtml()}${callOverlayHtml()}`;
   bindCommon();bindPage();bindCallControls();renderToast();
+}
+function renderAuthGate(){
+  const app=$('#app');app.className='';
+  app.innerHTML=authGateHtml();
+  bindAuthModal();
+  renderToast();
 }
 
 function topbarHtml(){
@@ -341,11 +348,17 @@ function groupCallSetupModalHtml(){
 }
 
 
-function authModalHtml(){
+function authFormFields(){
   const p=state.oauthProviders;const socials=[p.google&&['google','Google','G'],p.apple&&['apple','Apple','●'],p.discord&&['discord','Discord','D'],p.twitter&&['twitter','X','X']].filter(Boolean);
   const socialHtml=socials.length?`<div class="social-login-grid">${socials.map(([provider,label,mark])=>`<button class="social-login ${provider}" data-oauth="${provider}" type="button"><span class="social-mark">${mark}</span><span>Continue with ${label}</span></button>`).join('')}</div><div class="auth-divider"><span>or use email</span></div>`:'';
   const saved=esc(localStorage.getItem(REMEMBER_EMAIL_KEY)||'');
-  return modalWrap(`<div class="modal-head"><div><span class="kicker">ACCOUNT</span><h2>Community Arena account</h2><p>Sign in once and the installed app keeps your session active. Your device password manager can securely autofill your password.</p></div><button class="icon-btn" data-close-modal>${icon('close')}</button></div>${socialHtml}<div class="auth-tabs"><button class="btn primary" id="authSignInTab" type="button">Sign in</button><button class="btn secondary" id="authSignUpTab" type="button">Create account</button></div><form id="authForm" autocomplete="on"><div class="form-grid"><div class="field wide"><label>Email</label><input id="authEmail" name="username" type="email" autocomplete="username" inputmode="email" value="${saved}" placeholder="you@example.com" autocapitalize="none" spellcheck="false"></div><div class="field wide"><label>Password</label><input id="authPassword" name="password" type="password" autocomplete="current-password" minlength="8" placeholder="Password"></div><label class="remember-login wide"><input id="rememberEmail" type="checkbox" ${saved?'checked':''}><span><b>Remember my email</b><small>Password is handled by your device password manager, not stored by this app.</small></span></label><div id="signupExtras" class="signup-extras hidden"><div class="field"><label>Gamer tag</label><input id="authGamertag" maxlength="24" autocomplete="nickname" placeholder="Your ZC2 name"></div><div class="field"><label>Platform</label><select id="authPlatform"><option>Quest</option><option>PCVR</option><option>Both</option></select></div></div></div><div class="auth-action-row"><button class="btn primary big" id="authSubmit" type="submit">Sign in</button><button class="btn ghost" id="forgotPasswordBtn" type="button">Forgot password</button></div></form><p class="auth-note">Sessions persist automatically while valid, so normal use should not require repeated sign-in.</p>`,true);
+  return `${socialHtml}<div class="auth-tabs"><button class="btn primary" id="authSignInTab" type="button">Sign in</button><button class="btn secondary" id="authSignUpTab" type="button">Create account</button></div><form id="authForm" autocomplete="on"><div class="form-grid"><div class="field wide"><label>Email</label><input id="authEmail" name="username" type="email" autocomplete="username" inputmode="email" value="${saved}" placeholder="you@example.com" autocapitalize="none" spellcheck="false"></div><div class="field wide"><label>Password</label><input id="authPassword" name="password" type="password" autocomplete="current-password" minlength="8" placeholder="Password"></div><label class="remember-login wide"><input id="rememberEmail" type="checkbox" ${saved?'checked':''}><span><b>Remember my email</b><small>Password is handled by your device password manager, not stored by this app.</small></span></label><div id="signupExtras" class="signup-extras hidden"><div class="field"><label>Gamer tag</label><input id="authGamertag" maxlength="24" autocomplete="nickname" placeholder="Your ZC2 name"></div><div class="field"><label>Platform</label><select id="authPlatform"><option>Quest</option><option>PCVR</option><option>Both</option></select></div></div></div><div class="auth-action-row"><button class="btn primary big" id="authSubmit" type="submit">Sign in</button><button class="btn ghost" id="forgotPasswordBtn" type="button">Forgot password</button></div></form><p class="auth-note">Sessions persist automatically while valid, so normal use should not require repeated sign-in.</p>`;
+}
+function authModalHtml(){
+  return modalWrap(`<div class="modal-head"><div><span class="kicker">ACCOUNT</span><h2>Community Arena account</h2><p>Sign in once and the installed app keeps your session active. Your device password manager can securely autofill your password.</p></div><button class="icon-btn" data-close-modal>${icon('close')}</button></div>${authFormFields()}`,true);
+}
+function authGateHtml(){
+  return `<div class="auth-gate"><div class="home-zombie-hero auth-gate-hero"><img src="./zc2-zombie-smash-promo.png?v=4" alt="ZC2 Arena Zombie Smash"><div class="home-zombie-copy"><span class="live-pill"><i></i>ZC2 ARENA</span><h1>ZOMBIE<br><em>SMASH</em></h1><p>Survive the horde, fight six named bosses and chase the global leaderboard in vertical or horizontal play. Sign in below to unlock Community Arena and start playing.</p><div class="home-game-stats"><span><b>6</b><small>BOSSES</small></span><span><b>2</b><small>ORIENTATIONS</small></span><span><b>∞</b><small>FINAL WAVE</small></span></div></div></div><div class="auth-gate-formwrap"><div class="modal narrow auth-gate-modal"><div class="modal-body"><div class="auth-gate-brand"><img src="./community-arena-emblem.png?v=4" alt=""><span class="brand-copy"><span class="brand-title"><strong>ZC2</strong></span><span class="brand-rule"></span><small>COMMUNITY ARENA</small></span></div><div class="modal-head"><div><span class="kicker">ACCOUNT</span><h2>Sign in to continue</h2><p>Create a free account or sign in to explore Community Arena and play Zombie Smash.</p></div></div>${authFormFields()}</div></div></div></div>`;
 }
 
 function inviteModalHtml(){const link=state.modal.link||baseUrl();return modalWrap(`<div class="modal-head"><div><span class="kicker">INVITE</span><h2>${state.modal.title||'Join the community'}</h2><p>Share this link by email, text, copy/paste or the device share sheet used by Quest and other apps.</p></div><button class="icon-btn" data-close-modal>${icon('close')}</button></div><div class="invite-actions"><button id="inviteEmail">${icon('mail')}Email</button><button id="inviteSms">${icon('sms')}Phone / SMS</button><button id="inviteCopy">${icon('content_copy')}Copy link</button><button id="inviteNative">${icon('share')}Quest / apps</button></div><div class="invite-link">${esc(link)}</div><img class="invite-artwork" src="./community-arena-join.webp?v=4" alt="Join ZC2 Community Arena">`,true);}
