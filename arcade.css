@@ -112,3 +112,20 @@ body.zs52-playing .notifications-drawer{
 .zs52-move-zone>span{font-family:var(--cond)!important;font-weight:900!important;letter-spacing:.16em!important;color:#d9c948!important;text-transform:uppercase!important}
 .zs52-ticker{left:31%!important;right:31%!important;bottom:2.15%!important;padding:5px 4px!important;background:rgba(4,6,7,.68)!important;border-top:1px solid rgba(242,213,31,.24)!important;border-bottom:1px solid rgba(242,213,31,.12)!important;color:#e0e4e5!important;font-family:var(--cond)!important;font-size:8px!important}
 @media(max-width:760px){.zs52-topbtn.menu,.zs52-topbtn.pause{width:78px!important}.zs52-exit{width:38px!important;height:38px!important}.zs52-screen::after{opacity:.68}.zs52-ticker{left:29%!important;right:29%!important;font-size:7px!important}}
+
+/* Landscape play: MOVE stays on the left, FIRE on the right, and the screen box is
+   locked to the console art's own 2:1 aspect ratio instead of being stretched to fill
+   a portrait-shaped box - that stretch is what was squashing the frame/skin art. */
+@media(orientation:landscape){
+  .zs52-overlay{padding:0}
+  .zs52-shell{width:100vw!important;max-width:min(100vw,calc(100dvh * 2.15))!important;height:100dvh!important}
+  .zs52-screen{left:24%!important;right:24%!important;top:50%!important;height:auto!important;bottom:auto!important;aspect-ratio:2/1;transform:translateY(-50%)}
+  .zs52-move-zone{left:2%!important;right:auto!important;top:50%!important;bottom:auto!important;width:18%!important;height:74%!important;transform:translateY(-50%)}
+  .zs52-move-zone.flipped{left:auto!important;right:2%!important}
+  .zs52-fire{right:2.4%!important;left:auto!important;top:50%!important;bottom:auto!important;width:18%!important;transform:translateY(-50%)}
+  .zs52-fire.flipped{right:auto!important;left:2.4%!important}
+  .zs52-topbtn.menu{left:2%!important}
+  .zs52-topbtn.pause{right:2.4%!important}
+  .zs52-exit{right:2.6%!important;top:2.2%!important}
+  .zs52-ticker{left:26%!important;right:26%!important;bottom:2%!important}
+}
