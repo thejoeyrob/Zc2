@@ -81,3 +81,15 @@ body.zs52-playing #app{visibility:hidden!important;pointer-events:none!important
  .mode-landscape .zs52-hudtop{left:38px!important;right:38px!important}
  .mode-landscape .zs52-ticker{left:74px!important;right:74px!important}
 }
+.zs52-grenade{position:absolute;z-index:11;width:52px;height:52px;border:2px solid rgba(255,255,255,.14);border-radius:50%;background:radial-gradient(circle at 34% 30%,#2c3234,#0a0d0e 70%);color:#e7ecee;display:grid;place-items:center;touch-action:manipulation;transition:box-shadow .15s ease,opacity .15s ease,filter .15s ease;left:50%;bottom:64px;transform:translateX(-50%)}
+.zs52-grenade .material-symbols-rounded{font-size:24px}
+.zs52-grenade.empty{opacity:.4;filter:grayscale(.7);box-shadow:none;border-color:rgba(255,255,255,.1)}
+.zs52-grenade:not(.empty){box-shadow:0 0 9px 2px var(--skin-accent),0 0 20px 7px color-mix(in srgb,var(--skin-accent) 55%,transparent),inset 0 0 8px color-mix(in srgb,var(--skin-accent) 45%,transparent);border-color:color-mix(in srgb,var(--skin-accent) 75%,#fff 15%)}
+.zs52-grenade.pressed{transform:translateX(-50%) translateY(2px) scale(.94)}
+.mode-landscape .zs52-grenade{bottom:58px}
+.zs52-grenadebadge{color:#ffb15a!important}
+.zs52-grenadebadge .material-symbols-rounded{font-size:15px}
+.zs52-weaponstack{position:absolute;z-index:6;right:6px;top:46px;display:flex;flex-direction:column;gap:5px}
+.zs52-weaponstack button{width:36px;height:30px;border:1px solid rgba(243,213,31,.4);background:rgba(4,7,8,.85);color:#f3d51f;font:900 10px var(--cond);letter-spacing:.03em;touch-action:manipulation}
+.zs52-weaponstack button:active{background:rgba(243,213,31,.22)}
+.mode-landscape .zs52-weaponstack{top:38px;right:96px}
