@@ -4,7 +4,7 @@
   "backendStatus": "configured-and-hardened",
   "auth": "email/password + pre-wired Google, Apple, Discord and X OAuth; providers activate when configured in Supabase. Sign-in is required before the app can be explored - a game-tease auth gate replaces the whole app until the visitor signs in or creates an account.",
   "adminCode": "configured server-side; not stored in this file",
-  "build": "5.25.0-adventure-omnidirectional",
+  "build": "5.26.0-hud-redesign-locked",
   "hosting": "Vercel-ready static PWA; Supabase is the shared backend",
   "artwork": [
     "community-arena-main.png",
@@ -23,15 +23,21 @@
     "Dr Mantis body-part minions in Classic stage 2",
     "Procedural sprite rendering for creature parts",
     "Live leaderboard integration",
-    "In-game music mood system (moody/triumphant/dramatic)"
+    "In-game music mood system (moody/triumphant/dramatic)",
+    "Fixed aspect ratio locked to iPhone SE (9:16 portrait / 16:9 landscape)",
+    "HUD with map-color-coordinated borders (six unique map color schemes)",
+    "Joey Rob positioned above bottom HUD bar, fully visible in gameplay",
+    "Black border bars with responsive grid layout for info display"
   ],
   "notes": [
     "Phase A: Renamed modes (Classic/Adventure), locked Adventure until Dr Mantis defeat, added admin cheat menu",
     "Phase B: Built retro joystick-navigable pause menu, replaced Dr Mantis stage-2 adds with body-part sprites",
     "Phase C: Adventure mode omnidirectional movement and 8-way aiming, walk-on intro, side-entry zombies",
+    "Phase D: Fixed aspect ratio layout based on iPhone SE, map-color-coordinated HUD borders, repositioned Joey Rob",
     "All movement input updates aim direction in landscape mode (joystick, arrow keys, button directions)",
     "Player sprite rotates to face aim direction; landscape zombies enter from right, breach on left edge",
-    "Hardened direct calls with Realtime plus polling signaling fallback and TURN relay fallback"
+    "Hardened direct calls with Realtime plus polling signaling fallback and TURN relay fallback",
+    "HUD bottom bar has 4 columns: grenades, lives (hearts), weapon+ammo, map name with map-specific border colors"
   ],
   "callSystem": {
     "direct": "WebRTC app-to-app call",
