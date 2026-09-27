@@ -3,7 +3,7 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 const SUPABASE_URL = 'https://xdsrnnkuxfaycnlngjbq.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_AicVoQAwV-KnlOs1Fc2RuQ_T81In0MC';
 const FOUNDERS_ID = '5adc5ebc-d73e-4226-bf18-c303c038b294';
-const BUILD = '5.13.1-google-button-branding';
+const BUILD = '5.14.0-messages-unread-badge';
 const REMEMBER_EMAIL_KEY='zc2-remember-email';
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
   auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
@@ -23,6 +23,7 @@ const state = {
   notificationsChannel:null, communityFeedChannel:null, callSignalChannel:null, callSignalPoll:null, callSeenSignals:new Set(), installPrompt:null, toast:'', modal:null, ocrProgress:0, adminData:null,
   featuredPortal:null, communitySearch:'', authRecovery:false, oauthProviders:{google:false,apple:false,twitter:false,discord:false},
   dmThreads:[], chatView:'room:general', showIntro:false, avatarDraftFile:null, avatarDraftUrl:'',
+  chatUnreadRooms:new Set(), chatUnreadDms:new Set(), chatActivityChannel:null,
   voice:{joined:false,roomId:null,channel:null,stream:null,peers:new Map(),audios:new Map(),candidates:new Map()},
   call:{id:null,peerId:null,peerName:'',direction:null,status:'idle',pc:null,stream:null,audio:null,muted:false,pendingCandidates:[],startedAt:null,timeout:null,disconnectTimer:null},
   groupCall:{id:null,title:'',hostId:null,hostName:'',direction:null,status:'idle',invitedIds:[],acceptedIds:[],declinedIds:[],startedAt:null,timeout:null,muted:false},
@@ -118,7 +119,7 @@ async function refreshAll(){
 }
 
 function clearPrivate(){
-  state.profile=null;state.admin=false;state.notifications=[];state.privateEvents=[];state.featuredPortal=null;state.dmThreads=[];state.dmTarget=null;state.dmThread=null;state.dmMessages=[];
+  state.profile=null;state.admin=false;state.notifications=[];state.privateEvents=[];state.featuredPortal=null;state.dmThreads=[];state.dmTarget=null;state.dmThread=null;state.dmMessages=[];state.chatUnreadRooms=new Set();state.chatUnreadDms=new Set();state.chatActivityChannel?.unsubscribe();state.chatActivityChannel=null;
   state.notificationsChannel?.unsubscribe();state.notificationsChannel=null;
   state.callSignalChannel?.unsubscribe();state.callSignalChannel=null;clearInterval(state.callSignalPoll);state.callSignalPoll=null;state.callSeenSignals.clear();
   if(state.call.status!=='idle') endCallLocal('signed-out',true);
@@ -158,6 +159,50 @@ async function loadPrivate(){
   const keepAdminSession=state.admin===true;
   state.profile=p.data||null;state.admin=keepAdminSession;state.notifications=n.data||[];state.privateEvents=priv.data||[];state.dmThreads=threads.data||[];
   await loadFeaturedPortal();subscribeNotifications();subscribeCallSignals();
+  await loadChatUnread();subscribeChatActivity();
+}
+
+function chatSeenKey(){return state.session?`zc2-chat-seen-${state.session.user.id}`:null;}
+function loadChatSeenMap(){const k=chatSeenKey();if(!k)return{rooms:{},dms:{}};try{const m=JSON.parse(localStorage.getItem(k)||'{}');return {rooms:m.rooms||{},dms:m.dms||{}};}catch{return{rooms:{},dms:{}};}}
+function markChatSeen(kind,id,ts){const k=chatSeenKey();if(!k)return;const map=loadChatSeenMap();map[kind][id]=ts||new Date().toISOString();localStorage.setItem(k,JSON.stringify(map));}
+
+async function loadChatUnread(){
+  if(!state.session)return;
+  const uid=state.session.user.id,seen=loadChatSeenMap();
+  const unreadRooms=new Set(),unreadDms=new Set();
+  const {data:roomRows}=await supabase.from('chat_messages').select('room_slug,created_at,user_id').order('created_at',{ascending:false}).limit(400);
+  const latestByRoom={};
+  (roomRows||[]).forEach(r=>{if(r.user_id===uid)return;if(!latestByRoom[r.room_slug]||r.created_at>latestByRoom[r.room_slug])latestByRoom[r.room_slug]=r.created_at;});
+  roomNames.forEach(([slug])=>{const latest=latestByRoom[slug];if(latest&&latest>(seen.rooms[slug]||''))unreadRooms.add(slug);});
+  const threadIds=(state.dmThreads||[]).map(t=>t.id);
+  if(threadIds.length){
+    const {data:dmRows}=await supabase.from('dm_messages').select('thread_id,created_at,user_id').in('thread_id',threadIds).order('created_at',{ascending:false}).limit(400);
+    const latestByThread={};
+    (dmRows||[]).forEach(r=>{if(r.user_id===uid)return;if(!latestByThread[r.thread_id]||r.created_at>latestByThread[r.thread_id])latestByThread[r.thread_id]=r.created_at;});
+    threadIds.forEach(id=>{const latest=latestByThread[id];if(latest&&latest>(seen.dms[id]||''))unreadDms.add(id);});
+  }
+  state.chatUnreadRooms=unreadRooms;state.chatUnreadDms=unreadDms;
+}
+
+function subscribeChatActivity(){
+  state.chatActivityChannel?.unsubscribe();if(!state.session)return;
+  const uid=state.session.user.id;
+  state.chatActivityChannel=supabase.channel('my-chat-activity')
+    .on('postgres_changes',{event:'INSERT',schema:'public',table:'chat_messages'},payload=>{
+      const row=payload.new;if(!row||row.user_id===uid)return;
+      if(!roomNames.some(r=>r[0]===row.room_slug))return;
+      const viewing=state.page==='chat'&&!state.dmTarget&&state.chatRoom===row.room_slug;
+      if(viewing){markChatSeen('rooms',row.room_slug,row.created_at);return;}
+      state.chatUnreadRooms.add(row.room_slug);renderSidebar();
+    })
+    .on('postgres_changes',{event:'INSERT',schema:'public',table:'dm_messages'},payload=>{
+      const row=payload.new;if(!row||row.user_id===uid)return;
+      const viewing=state.page==='chat'&&state.dmTarget&&state.dmThread===row.thread_id;
+      if(viewing){markChatSeen('dms',row.thread_id,row.created_at);return;}
+      if(!state.dmThreads.some(t=>t.id===row.thread_id))state.dmThreads.unshift({id:row.thread_id});
+      state.chatUnreadDms.add(row.thread_id);renderSidebar();
+    })
+    .subscribe();
 }
 
 async function loadFeaturedPortal(){
@@ -233,9 +278,11 @@ function topbarHtml(){
 
 
 function renderTopbar(){ const top=$('.topbar'); if(top){top.outerHTML=topbarHtml();bindCommon();} }
+function renderSidebar(){ const side=$('.sidebar'); if(side){side.outerHTML=sidebarHtml();bindCommon();} }
 function sidebarHtml(){
   const nav=[['home','home','Home'],['arcade','sports_esports','Play'],['tournaments','emoji_events','Tournaments'],['community','groups','Community'],['chat','forum','Messages'],['profile','person','Profile']];
-  return `<aside class="sidebar">${nav.map(([id,ic,label])=>`<button class="nav-btn ${state.page===id?'active':''} ${id==='arcade'?'game-nav':''}" data-page="${id}">${icon(ic)}<span>${label}</span></button>`).join('')}</aside>`;
+  const chatUnread=(state.chatUnreadRooms?.size||0)+(state.chatUnreadDms?.size||0);
+  return `<aside class="sidebar">${nav.map(([id,ic,label])=>`<button class="nav-btn ${state.page===id?'active':''} ${id==='arcade'?'game-nav':''}" data-page="${id}">${icon(ic)}${id==='chat'&&chatUnread?`<span class="badge nav-badge">${chatUnread>9?'9+':chatUnread}</span>`:''}<span>${label}</span></button>`).join('')}</aside>`;
 }
 
 
@@ -579,11 +626,15 @@ async function loadChat(){
   if(state.chatRoom==='mentions'){
     const tag=(state.profile?.gamertag||'').replace(/ /g,'_').toLowerCase();const {data}=await supabase.from('chat_messages').select('*').order('created_at',{ascending:false}).limit(300);state.chat=(data||[]).filter(m=>(m.body||'').toLowerCase().includes('@'+tag)).reverse();state.chatChannel=supabase.channel('chat-mentions').on('postgres_changes',{event:'INSERT',schema:'public',table:'chat_messages'},payload=>{if((payload.new.body||'').toLowerCase().includes('@'+tag)){state.chat.push(payload.new);if(state.page==='chat'&&!state.dmTarget&&state.chatRoom==='mentions')render();}}).subscribe();return;
   }
-  const {data}=await supabase.from('chat_messages').select('*').eq('room_slug',state.chatRoom).order('created_at').limit(120);state.chat=data||[];state.chatChannel=supabase.channel('chat-'+state.chatRoom).on('postgres_changes',{event:'INSERT',schema:'public',table:'chat_messages',filter:`room_slug=eq.${state.chatRoom}`},payload=>{state.chat.push(payload.new);if(state.page==='chat'&&!state.dmTarget)render();}).subscribe();
+  const {data}=await supabase.from('chat_messages').select('*').eq('room_slug',state.chatRoom).order('created_at').limit(120);state.chat=data||[];
+  if(state.chatUnreadRooms.delete(state.chatRoom))renderSidebar();markChatSeen('rooms',state.chatRoom);
+  state.chatChannel=supabase.channel('chat-'+state.chatRoom).on('postgres_changes',{event:'INSERT',schema:'public',table:'chat_messages',filter:`room_slug=eq.${state.chatRoom}`},payload=>{state.chat.push(payload.new);markChatSeen('rooms',state.chatRoom,payload.new.created_at);if(state.page==='chat'&&!state.dmTarget)render();}).subscribe();
 }
 
 async function openDm(id){
-  if(!state.session)return openAuth();const p=playerById(id);if(!p)return;state.dmTarget=p;state.chatRoom='general';state.dmChannel?.unsubscribe();const {data,error}=await supabase.rpc('get_or_create_dm_thread',{p_other:id});if(error)return setToast(error.message);state.dmThread=data;const msgs=await supabase.from('dm_messages').select('*').eq('thread_id',data).order('created_at').limit(120);state.dmMessages=msgs.data||[];if(!state.dmThreads.some(t=>t.id===data)){const th=await supabase.from('dm_threads').select('*').eq('id',data).maybeSingle();if(th.data)state.dmThreads.unshift(th.data);}state.dmChannel=supabase.channel('dm-'+data).on('postgres_changes',{event:'INSERT',schema:'public',table:'dm_messages',filter:`thread_id=eq.${data}`},payload=>{state.dmMessages.push(payload.new);if(state.page==='chat'&&state.dmTarget)render();}).subscribe();render();
+  if(!state.session)return openAuth();const p=playerById(id);if(!p)return;state.dmTarget=p;state.chatRoom='general';state.dmChannel?.unsubscribe();const {data,error}=await supabase.rpc('get_or_create_dm_thread',{p_other:id});if(error)return setToast(error.message);state.dmThread=data;const msgs=await supabase.from('dm_messages').select('*').eq('thread_id',data).order('created_at').limit(120);state.dmMessages=msgs.data||[];if(!state.dmThreads.some(t=>t.id===data)){const th=await supabase.from('dm_threads').select('*').eq('id',data).maybeSingle();if(th.data)state.dmThreads.unshift(th.data);}
+  if(state.chatUnreadDms.delete(data))renderSidebar();markChatSeen('dms',data);
+  state.dmChannel=supabase.channel('dm-'+data).on('postgres_changes',{event:'INSERT',schema:'public',table:'dm_messages',filter:`thread_id=eq.${data}`},payload=>{state.dmMessages.push(payload.new);markChatSeen('dms',data,payload.new.created_at);if(state.page==='chat'&&state.dmTarget)render();}).subscribe();render();
 }
 
 async function sendCurrentMessage(){const input=$('#chatInput');if(!input)return;const text=input.value.trim();if(!text)return;if(state.dmTarget){const {error}=await supabase.rpc('send_dm_message',{p_other:state.dmTarget.id,p_body:text});if(error)return setToast(error.message);}else{if(state.chatRoom==='mentions')return setToast('Choose a community channel to send a message.');const {error}=await supabase.rpc('send_chat_message',{p_room:state.chatRoom,p_body:text});if(error)return setToast(error.message);}input.value='';}

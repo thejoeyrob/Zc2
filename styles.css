@@ -119,3 +119,6 @@ html,body,#app,.shell{max-width:100%;overflow-x:hidden}body{overscroll-behavior-
 .auth-gate-brand img{width:44px;height:44px;border-radius:9px;box-shadow:0 0 0 1px rgba(242,213,31,.24)}
 @media(min-width:860px){.auth-gate{flex-direction:row}.auth-gate-hero{min-height:100dvh;flex:1.15}.auth-gate-formwrap{flex:1;padding:36px}}
 @media(max-width:760px){.auth-gate-hero{min-height:260px}.auth-gate-hero .home-game-stats{display:none}}
+.nav-btn{position:relative}
+.nav-badge{position:absolute;top:2px;right:16%;min-width:16px;height:16px;padding:0 3px;border-radius:50%;background:var(--yellow);color:#111;font:800 9px/16px var(--body);text-align:center;box-shadow:0 0 0 2px #0b1012;transform:none}
+@media(max-width:760px){.nav-badge{top:1px;right:12%;min-width:14px;height:14px;font-size:8px;line-height:14px}}
