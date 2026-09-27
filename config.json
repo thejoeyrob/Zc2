@@ -4,7 +4,7 @@
   "backendStatus": "configured-and-hardened",
   "auth": "email/password + pre-wired Google, Apple, Discord and X OAuth; providers activate when configured in Supabase. Sign-in is required before the app can be explored - a game-tease auth gate replaces the whole app until the visitor signs in or creates an account.",
   "adminCode": "configured server-side; not stored in this file",
-  "build": "5.18.0-glowing-humanity-handcuffs-attack",
+  "build": "5.19.0-full-cheat-code-set",
   "hosting": "Vercel-ready static PWA; Supabase is the shared backend",
   "artwork": [
     "community-arena-main.png",
@@ -62,7 +62,10 @@
     "specialSkin": "Phantom Elite",
     "cheats": [
       "BURST - unlocks the burst-fire gun",
-      "FATAMY - skips straight to the Fat Amy boss fight"
+      "FATAMY - skips straight to the Fat Amy boss fight",
+      "DMR82 - infinite DMR-82 ammo",
+      "GOLDHEARTS - 10 lives, 5 of them gold",
+      "ELITE - unlocks the Phantom Elite console skin"
     ],
     "cheatRunsOnLeaderboard": false
   }
