@@ -159,15 +159,23 @@ function toggleFlip(){A.prefs.flip=!A.prefs.flip;savePrefs();renderOverlay()}
 function toggleMusic(){A.prefs.music=!A.prefs.music;savePrefs();A.prefs.music?startMusic():stopMusic();renderOverlay()}
 function cheatSkipToBoss(bossId){const e=A.engine;if(!e||!e.started)return toast('Start a run first.');const order=BOSS_DEFS.filter(b=>b.threshold!=null).sort((a,b)=>a.threshold-b.threshold).map(b=>b.id).concat(BOSS_DEFS.filter(b=>b.threshold==null).map(b=>b.id));const idx=order.indexOf(bossId);if(idx<0)return;for(let i=0;i<idx;i++)e.bossesSeen[order[i]]=true;e.bossesDefeatedCount=Math.min(BOSS_DEFS.length-1,idx);const def=bossDef(bossId);e.score=Math.max(e.score,def?.threshold||e.score);e.zombies=[];e.bullets=[];e.bossProjectiles=[];e.pickups=[];e.waveSpawned=e.waveTarget;e.waveResolved=e.waveTarget;e.cheated=true;e.ticker=`Cheat activated: skipping to ${def?.name||bossId}`}
 const CHEAT_CODES={
+ 'burst':()=>{const e=A.engine;if(e){e.cheats.burst=true;e.cheated=true;setGun('burst')}toast('Cheat activated: BURST gun unlocked.')},
+ 'fatamy':()=>{cheatSkipToBoss('fatamy');toast('Cheat activated: skipping to Fat Amy.')},
+ 'dmr82':()=>{const e=A.engine;if(!e)return toast('Start a run first.');e.cheats.dmr=true;e.cheated=true;setGun('dmr');toast('Cheat activated: infinite DMR-82 ammo.')},
+ 'goldhearts':()=>{const e=A.engine;if(!e)return toast('Start a run first.');e.cheats.tenLives=true;e.cheated=true;e.player.maxLives=10;e.player.lives=10;toast('Cheat activated: 10 lives - 5 of them gold.')},
  'elite':()=>{A.prefs.codeSkins=[...new Set([...(A.prefs.codeSkins||[]),'phantom'])];savePrefs();toast('Cheat activated: Phantom Elite skin unlocked.')}
 };
 const CHEAT_SEQUENCES=[
- {pattern:['left','left','right','right','left','right','fire'],action:'elite'}
+ {pattern:['up','up','down','down','left','right','left','right','fire'],action:'goldhearts'},
+ {pattern:['left','left','right','right','left','right','fire'],action:'elite'},
+ {pattern:['right','right','up','up','grenade'],action:'dmr82'},
+ {pattern:['down','down','up','up','fire'],action:'burst'},
+ {pattern:['up','down','up','down','grenade'],action:'fatamy'}
 ];
 function pushCheatInput(tok){const buf=(A.cheatSeq=A.cheatSeq||[]);buf.push(tok);if(buf.length>16)buf.shift();for(const s of CHEAT_SEQUENCES){const p=s.pattern;if(buf.length>=p.length&&p.every((v,i)=>buf[buf.length-p.length+i]===v)){CHEAT_CODES[s.action]();A.cheatSeq=[];return}}}
 let joyFlickArmed=true;
 function joyFlick(nx,ny){const mag=Math.hypot(nx,ny);if(mag<.3)joyFlickArmed=true;else if(mag>.68&&joyFlickArmed){joyFlickArmed=false;const dir=Math.abs(nx)>Math.abs(ny)?(nx>0?'right':'left'):(ny>0?'down':'up');if(A.menu)menuHandleDir(dir);else pushCheatInput(dir)}}
-async function redeemCode(){const raw=$('#zs52SkinCode')?.value.trim()||'';const cheat=CHEAT_CODES[raw.toLowerCase()];if(cheat){cheat();renderOverlay();return}if(!/^\d{4}$/.test(raw))return toast('Enter a 4-digit skin code or cheat word.');try{const {data,error}=await deps.supabase.rpc('redeem_arcade_skin_code',{p_code:raw});if(error)throw error;if(!data)return toast('Code not recognised.');A.prefs.codeSkins=[...new Set([...(A.prefs.codeSkins||[]),data.skin_id||data])];savePrefs();toast('Skin unlocked.');renderOverlay();}catch(e){toast(e.message||'Code could not be redeemed.')}}
+async function redeemCode(){const raw=$('#zs52SkinCode')?.value.trim()||'';const lowerRaw=raw.toLowerCase();if(lowerRaw==='elite'){CHEAT_CODES.elite();renderOverlay();return}if(!/^\d{4}$/.test(raw))return toast('Enter a 4-digit skin code.');try{const {data,error}=await deps.supabase.rpc('redeem_arcade_skin_code',{p_code:raw});if(error)throw error;if(!data)return toast('Code not recognised.');A.prefs.codeSkins=[...new Set([...(A.prefs.codeSkins||[]),data.skin_id||data])];savePrefs();toast('Skin unlocked.');renderOverlay();}catch(e){toast(e.message||'Code could not be redeemed.')}}
 function selectSkin(id){if(!isUnlocked(id))return;A.prefs.skin=id;savePrefs();refreshSkinCards();if(A.open)renderOverlay();if(state().session)deps.supabase.from('arcade_profiles').upsert({user_id:state().session.user.id,selected_skin:id,high_score:A.prefs.high,unlocked_skins:A.prefs.codeSkins||[]},{onConflict:'user_id'}).then(()=>{}).catch(()=>{});}
 function startGameIfNeeded(){if(!A.engine||A.engine.started)return;A.engine.started=true;if(isLandscape()){A.engine.walkOnPhase='intro';A.engine.ticker='Joey Rob enters'}else{A.engine.ticker='Wave 1 incoming'}startLoop();const b=$('#zs52Pause');if(b)b.innerHTML=`${icon('pause')}<span class="zs52-btnlabel">PAUSE</span>`}
 function resizeCanvas(){const c=$('#zs52Canvas'),e=A.engine;if(!c||!e)return;const r=c.getBoundingClientRect(),d=Math.min(devicePixelRatio||1,2);c.width=Math.max(1,Math.round(r.width*d));c.height=Math.max(1,Math.round(r.height*d));e.ctx=c.getContext('2d');e.w=r.width;e.h=r.height;if(isLandscape()){e.player.x=e.w*.12;if(!e.player.y)e.player.y=e.h*.5;e.player.y=Math.max(34,Math.min(e.h-34,e.player.y));e.bgOffset=e.bgOffset||0}else{e.player.y=e.h*.70;if(!e.player.x)e.player.x=e.w*.5;e.player.x=Math.max(30,Math.min(e.w-30,e.player.x))}e.canvas=c;}
