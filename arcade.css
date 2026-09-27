@@ -137,3 +137,15 @@ body.zs52-playing #app{visibility:hidden!important;pointer-events:none!important
 .mode-landscape .zs52-topbtn.menu{left:0!important}
 .mode-landscape .zs52-topbtn.pause{right:0!important}
 .mode-landscape .zs52-btnlabel{display:inline;font:900 11px var(--cond);letter-spacing:.08em}
+
+/* v5.22 — retro joystick-navigable pause menu */
+.zs52-menu-list{display:grid;gap:6px;margin-top:4px}
+.zs52-menu-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px 14px;border:1px solid #333e43;background:#0d1316;color:#fff;text-align:left;font:700 14px var(--cond);letter-spacing:.02em;width:100%}
+.zs52-menu-row.danger{border-color:#4a2624;color:#ffb9b3}
+.zs52-menu-row.focused{border-color:#38d0ff;box-shadow:inset 3px 0 #38d0ff,0 0 12px rgba(56,208,255,.35);background:#0f1b20}
+.zs52-row-value{color:#f3d51f;font:900 13px var(--cond);letter-spacing:.05em}
+.zs52-menu-back{display:flex;align-items:center;gap:8px;margin-top:10px;padding:10px 14px;border:1px solid #333e43;background:#0d1316;color:#cfd5d7;width:100%;font:700 12px var(--cond);letter-spacing:.06em;text-transform:uppercase}
+.zs52-menu-back.focused{border-color:#38d0ff;box-shadow:0 0 12px rgba(56,208,255,.35);color:#fff;background:#0f1b20}
+.zs52-menu-skin.focused{border-color:#38d0ff!important;box-shadow:inset 3px 0 #38d0ff,0 0 12px rgba(56,208,255,.35)!important}
+.zs52-admin-row.focused{border-color:#38d0ff;box-shadow:0 0 12px rgba(56,208,255,.35);background:#161f26}
+.zs52-confirm-prompt{margin:2px 0 10px;padding:10px;color:#d7dde0;font-size:12px;line-height:1.55;border:1px solid rgba(245,215,31,.22);background:rgba(245,215,31,.05)}
