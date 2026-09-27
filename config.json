@@ -4,7 +4,7 @@
   "backendStatus": "configured-and-hardened",
   "auth": "email/password + pre-wired Google, Apple, Discord and X OAuth; providers activate when configured in Supabase. Sign-in is required before the app can be explored - a game-tease auth gate replaces the whole app until the visitor signs in or creates an account.",
   "adminCode": "configured server-side; not stored in this file",
-  "build": "5.24.0-portrait-deck-mantis-parts",
+  "build": "5.25.0-adventure-omnidirectional",
   "hosting": "Vercel-ready static PWA; Supabase is the shared backend",
   "artwork": [
     "community-arena-main.png",
@@ -14,22 +14,23 @@
   ],
   "browserAccess": "install-gated",
   "features": [
-    "live Founders League registration",
-    "visual tournament map",
-    "single-row navigation",
-    "dropdown messages",
-    "admin top-menu access",
-    "simplified signup",
-    "profile photo upload",
-    "on-device Anime Power portrait",
-    "premium intro",
-    "JW EDS branding"
+    "Classic mode: fixed-position vertical horde defense",
+    "Adventure mode: omnidirectional movement and 8-way aiming",
+    "Walk-on intro sequence for Adventure mode",
+    "Side-entry zombie spawning in landscape",
+    "Joystick + arrow key controls",
+    "Retro menu system with directional navigation",
+    "Dr Mantis body-part minions in Classic stage 2",
+    "Procedural sprite rendering for creature parts",
+    "Live leaderboard integration",
+    "In-game music mood system (moody/triumphant/dramatic)"
   ],
   "notes": [
-    "Rebuilt Zombie Smash controls around left, right and straight-ahead fire only",
-    "Changed game battlefield to clean procedural ground textures for readability",
-    "Added movement-line speed, rapid-fire, shield and existing weapon/health pickups",
-    "Added arcade score persistence fallback and Zombie Smash score to Community League",
+    "Phase A: Renamed modes (Classic/Adventure), locked Adventure until Dr Mantis defeat, added admin cheat menu",
+    "Phase B: Built retro joystick-navigable pause menu, replaced Dr Mantis stage-2 adds with body-part sprites",
+    "Phase C: Adventure mode omnidirectional movement and 8-way aiming, walk-on intro, side-entry zombies",
+    "All movement input updates aim direction in landscape mode (joystick, arrow keys, button directions)",
+    "Player sprite rotates to face aim direction; landscape zombies enter from right, breach on left edge",
     "Hardened direct calls with Realtime plus polling signaling fallback and TURN relay fallback"
   ],
   "callSystem": {
@@ -71,7 +72,7 @@
     "adminCheatMenu": "Menu > Admin tab lists every cheat with a one-tap action button (admin access only)"
   },
   "gameModes": {
-    "classic": {"label": "Classic Play", "orientation": "portrait", "unlock": "always available"},
-    "adventure": {"label": "Adventure Play", "orientation": "landscape", "unlock": "unlocked by defeating Dr Mantis in Classic Play, or admin access", "status": "control layout + lock/unlock shipped; new side-scrolling gameplay in progress"}
+    "classic": {"label": "Classic Play", "orientation": "portrait", "unlock": "always available", "gameplay": "Vertical horde defense - Joey Rob fixed on bottom, fires up, zombies advance downward"},
+    "adventure": {"label": "Adventure Play", "orientation": "landscape", "unlock": "defeated Dr Mantis in Classic Play or admin access", "gameplay": "Omnidirectional movement - Joey Rob walks onto screen from left, free movement and 8-way aiming, zombies enter from right edge, breach on left"}
   }
 }
