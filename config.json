@@ -4,7 +4,7 @@
   "backendStatus": "configured-and-hardened",
   "auth": "email/password + pre-wired Google, Apple, Discord and X OAuth; providers activate when configured in Supabase. Sign-in is required before the app can be explored - a game-tease auth gate replaces the whole app until the visitor signs in or creates an account.",
   "adminCode": "configured server-side; not stored in this file",
-  "build": "5.16.0-joystick-default-and-zombie-app-icon",
+  "build": "5.17.0-joystick-only-cheats-goldheart-fixes",
   "hosting": "Vercel-ready static PWA; Supabase is the shared backend",
   "artwork": [
     "community-arena-main.png",
@@ -61,8 +61,8 @@
     "skinCodes": true,
     "specialSkin": "Phantom Elite",
     "cheats": [
-      "Unlimited DMR-82",
-      "10 lives / gold hearts"
+      "BURST - unlocks the burst-fire gun",
+      "FATAMY - skips straight to the Fat Amy boss fight"
     ],
     "cheatRunsOnLeaderboard": false
   }
