@@ -242,6 +242,30 @@ body.zs52-playing #app{visibility:hidden!important;pointer-events:none!important
 }
 .mode-portrait .zs52-fire.flipped{right:auto!important;left:3%!important}
 
+/* Accuracy bonus badge — positioned in HUD */
+.zs52-accuracy-badge{
+  position:absolute;bottom:-8px;right:-18px;
+  width:32px;height:32px;
+  display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(circle at 35% 30%,#00ff00,#00cc00 70%);
+  border:2px solid #00ff00;
+  border-radius:50%;
+  color:#000;font:700 11px var(--cond);
+  box-shadow:0 0 12px rgba(0,255,0,.8),inset 0 0 6px rgba(255,255,255,.4),0 2px 4px rgba(0,0,0,.5);
+  text-shadow:0 0 4px rgba(0,255,0,.6);
+  z-index:3;pointer-events:none;
+  transition:transform .12s cubic-bezier(.34,1.56,.64,1)
+}
+.zs52-accuracy-pulse{
+  animation:zs52-accuracy-shake .3s ease-out
+}
+@keyframes zs52-accuracy-shake{
+  0%{transform:scale(1) translateX(0) translateY(0)}
+  30%{transform:scale(2.2) translateX(-2px) translateY(-2px)}
+  60%{transform:scale(2.2) translateX(1px) translateY(1px)}
+  100%{transform:scale(1) translateX(0) translateY(0)}
+}
+
 /* Responsive text scaling */
 @media(max-width:480px){
   .zs52-topbtn{font-size:10px!important;padding:0 8px!important;min-width:70px!important;height:42px!important}
@@ -249,4 +273,5 @@ body.zs52-playing #app{visibility:hidden!important;pointer-events:none!important
   .mode-portrait .zs52-move-zone{width:20%!important;height:4.4%!important}
   .mode-portrait .zs52-fire{width:20%!important;height:4.4%!important}
   .zs52-grenade{min-width:48px!important;min-height:48px!important}.zs52-grenade::before{border-width:1.5px;inset:-3px}
+  .zs52-accuracy-badge{width:28px!important;height:28px!important;font-size:9px!important;bottom:-6px!important;right:-14px!important}
 }
