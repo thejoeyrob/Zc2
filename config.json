@@ -4,7 +4,7 @@
   "backendStatus": "configured-and-hardened",
   "auth": "email/password + pre-wired Google, Apple, Discord and X OAuth; providers activate when configured in Supabase. Sign-in is required before the app can be explored - a game-tease auth gate replaces the whole app until the visitor signs in or creates an account.",
   "adminCode": "configured server-side; not stored in this file",
-  "build": "5.23.0-retro-joystick-menu",
+  "build": "5.24.0-portrait-deck-mantis-parts",
   "hosting": "Vercel-ready static PWA; Supabase is the shared backend",
   "artwork": [
     "community-arena-main.png",

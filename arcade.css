@@ -40,18 +40,18 @@ body.zs52-playing #app{visibility:hidden!important;pointer-events:none!important
 .skin-phantom .zs52-skinwash{filter:saturate(1.45) contrast(1.18) brightness(.67)}
 
 /* Portrait — clear two-button horizontal movement, large playfield, compact console deck. */
-.mode-portrait .zs52-screen{left:18px!important;right:18px!important;top:40px!important;bottom:102px!important}
+.mode-portrait .zs52-screen{left:18px!important;right:18px!important;top:40px!important;bottom:148px!important}
 .mode-portrait .zs52-topbtn{top:max(5px,env(safe-area-inset-top,0px))!important;width:44px!important;height:30px!important}
 .mode-portrait .zs52-topbtn.menu{left:10px!important}.mode-portrait .zs52-topbtn.pause{right:10px!important}
-.mode-portrait .zs52-move-zone{left:10px!important;bottom:11px!important;width:126px!important;height:62px!important}
-.mode-portrait .zs52-move-zone.flipped{left:auto!important;right:10px!important}
+.mode-portrait .zs52-move-zone{left:22px!important;bottom:24px!important;width:126px!important;height:62px!important}
+.mode-portrait .zs52-move-zone.flipped{left:auto!important;right:22px!important}
 .zs52-portrait-move{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%;height:100%;align-items:center}
 .zs52-lrbtn{display:block;width:58px;height:58px;border:0;background-color:transparent;background-position:center;background-size:contain;background-repeat:no-repeat;touch-action:none}
 .zs52-lrbtn.left{background-image:url('./control-left.png')}.zs52-lrbtn.right{background-image:url('./control-right.png')}
 .zs52-lrbtn.pressed{transform:translateY(2px) scale(.965);filter:brightness(.78) drop-shadow(0 2px 3px rgba(0,0,0,.45))!important}
-.mode-portrait .zs52-fire{right:10px!important;bottom:3px!important;width:86px!important;height:86px!important}
-.mode-portrait .zs52-fire.flipped{right:auto!important;left:10px!important}
-.mode-portrait .zs52-ticker{left:142px!important;right:102px!important;bottom:17px!important;min-height:30px;padding:6px 4px!important;display:grid;place-items:center;font-size:7px!important;background:rgba(4,6,7,.78)!important}
+.mode-portrait .zs52-fire{right:22px!important;bottom:20px!important;width:98px!important;height:98px!important}
+.mode-portrait .zs52-fire.flipped{right:auto!important;left:22px!important}
+.mode-portrait .zs52-ticker{left:158px!important;right:136px!important;bottom:28px!important;min-height:30px;padding:6px 4px!important;display:grid;place-items:center;font-size:7px!important;background:rgba(4,6,7,.78)!important}
 
 /* Landscape — PSP layout. Controls live on the side pods, not on top of the game. */
 .mode-landscape .zs52-screen{left:82px!important;right:82px!important;top:14px!important;bottom:14px!important}
@@ -67,11 +67,11 @@ body.zs52-playing #app{visibility:hidden!important;pointer-events:none!important
 .zs52-skin-grid{overflow-y:auto!important;-webkit-overflow-scrolling:touch!important;overscroll-behavior:contain!important}
 
 @media(max-width:760px){
- .mode-portrait .zs52-screen{left:14px!important;right:14px!important;top:39px!important;bottom:98px!important}
- .mode-portrait .zs52-move-zone{left:8px!important;bottom:9px!important;width:120px!important;height:60px!important}
+ .mode-portrait .zs52-screen{left:14px!important;right:14px!important;top:39px!important;bottom:142px!important}
+ .mode-portrait .zs52-move-zone{left:20px!important;bottom:22px!important;width:120px!important;height:60px!important}
  .zs52-lrbtn{width:56px!important;height:56px!important}
- .mode-portrait .zs52-fire{right:8px!important;bottom:2px!important;width:82px!important;height:82px!important}
- .mode-portrait .zs52-ticker{left:134px!important;right:96px!important;bottom:14px!important}
+ .mode-portrait .zs52-fire{right:20px!important;bottom:19px!important;width:92px!important;height:92px!important}
+ .mode-portrait .zs52-ticker{left:150px!important;right:128px!important;bottom:26px!important}
  .zs52-skin-grid{max-height:390px!important}
 }
 @media(orientation:landscape) and (max-height:520px){
@@ -86,7 +86,7 @@ body.zs52-playing #app{visibility:hidden!important;pointer-events:none!important
 .zs52-grenade.zs52-noammo{opacity:.4;filter:grayscale(.7);box-shadow:none;border-color:rgba(255,255,255,.1)}
 .zs52-grenade:not(.zs52-noammo){border-color:color-mix(in srgb,var(--skin-accent) 75%,#fff 15%)}
 .zs52-grenade.pressed{transform:translateX(-50%) translateY(2px) scale(.94)}
-.mode-portrait .zs52-grenade{bottom:42px}
+.mode-portrait .zs52-grenade{bottom:58px}
 .zs52-weaponstack{display:none!important}
 .zs52-btnlabel{margin-left:5px}
 .mode-portrait .zs52-btnlabel{display:none}
@@ -106,10 +106,10 @@ body.zs52-playing #app{visibility:hidden!important;pointer-events:none!important
 .zs52-arrow-btn.left{--rot:-90deg}
 .zs52-arrow-btn.right{--rot:90deg}
 .zs52-arrow-btn.pressed{filter:brightness(.78);transform:rotate(var(--rot)) scale(.92)}
-.zs52-joystick{position:relative;width:98px;height:98px;border-radius:50%;background:radial-gradient(circle at 35% 30%,color-mix(in srgb,var(--skin-accent) 28%,#242b2e),#0a0e10 72%);box-shadow:inset 0 0 0 1px rgba(255,255,255,.1),0 4px 12px rgba(0,0,0,.5);touch-action:none}
+.zs52-joystick{position:relative;width:112px;height:112px;border-radius:50%;background:radial-gradient(circle at 35% 30%,color-mix(in srgb,var(--skin-accent) 28%,#242b2e),#0a0e10 72%);box-shadow:inset 0 0 0 1px rgba(255,255,255,.1),0 4px 12px rgba(0,0,0,.5);touch-action:none}
 .zs52-joystick-knob{position:absolute;left:50%;top:50%;width:46px;height:46px;margin:-23px 0 0 -23px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff,var(--skin-accent) 65%);box-shadow:0 3px 8px rgba(0,0,0,.5),inset 0 0 0 1px rgba(255,255,255,.4);pointer-events:none}
 .zs52-joystick.pressed{box-shadow:inset 0 0 0 1px rgba(255,255,255,.25),0 0 16px color-mix(in srgb,var(--skin-accent) 55%,transparent),0 4px 12px rgba(0,0,0,.5)}
-@media(max-width:400px){.zs52-arrow-btn{width:54px;height:54px}.zs52-move-pair.horizontal{gap:12px}.zs52-move-pair.vertical{gap:18px}.zs52-joystick{width:82px;height:82px}.zs52-joystick-knob{width:38px;height:38px;margin:-19px 0 0 -19px}}
+@media(max-width:400px){.zs52-arrow-btn{width:54px;height:54px}.zs52-move-pair.horizontal{gap:12px}.zs52-move-pair.vertical{gap:18px}.zs52-joystick{width:96px;height:96px}.zs52-joystick-knob{width:42px;height:42px;margin:-21px 0 0 -21px}}
 
 /* v5.21 — mode lock UI */
 .zs510-orientation button.locked{opacity:.5;cursor:not-allowed}
