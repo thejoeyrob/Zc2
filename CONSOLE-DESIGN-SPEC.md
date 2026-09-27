@@ -41,13 +41,14 @@ The console frame is designed using reference geometry locked to the device scre
 - **Haptic**: `press` pattern (12ms, 6ms delay, 12ms)
 - **Color**: Skin-coordinated accent color
 
-### Grenade Button (Center)
-- **Position**: Centered horizontally and vertically in gameplay area
-- **Size**: 68px (portrait), scales responsively in landscape
+### Grenade Button (Center of Control Panel)
+- **Position**: Centered horizontally in control panel area (below screen), not in gameplay center
+- **Size**: 6.8% of console width, scales responsively on all devices
+- **Color**: ALWAYS yellow (#ffff00), never skin-coordinated
 - **Neon Ring Indicator**:
-  - **Inactive** (no grenades): Greyed-out static ring with low opacity
-  - **Active** (grenades available): Glowing cyan/neon ring with animation
-  - **Color varies by skin** (see Color Coordination below)
+  - **Inactive** (no grenades): Greyed-out static blue ring (#0066ff) with low opacity
+  - **Active** (grenades available): Glowing cyan neon ring (#00ddff) with pulsing animation
+  - **Ring is always blue regardless of skin choice**
 - **Haptic**: `grenade` pattern (16ms, 8ms delay, 16ms, 8ms delay, 16ms)
 - **Label**: Explosion icon
 
@@ -72,21 +73,12 @@ The console frame is designed using reference geometry locked to the device scre
 
 ## Color Coordination
 
-Grenade neon ring colors by skin:
+**Grenade Button**: Always yellow (#ffff00) with blue neon ring, regardless of console skin:
+- **Button Color**: #ffff00 (bright yellow)
+- **Neon Ring Inactive**: #0066ff (blue, low opacity)
+- **Neon Ring Active**: #00ddff (cyan, full glow)
 
-| Skin | Inactive Color | Active Color | Hex Active |
-|------|---|---|---|
-| Gunmetal | #6b7d8f (greyed) | #8fa3b8 | #8fa3b8 |
-| Hazard | #ffc000 | #ffea00 | #ffea00 |
-| Neon Rogue | #00ffff | #00ffff | #00ffff |
-| Jack-o-Gun | #ff6600 | #ffaa00 | #ffaa00 |
-| MilSpec | #7fa347 | #a8d262 | #a8d262 |
-| Arcade Blast | #ee42b5 | #ff66dd | #ff66dd |
-| Blood Steel | #ff4444 | #ff7777 | #ff7777 |
-| Toxic Slime | #75f52d | #a8ff5d | #a8ff5d |
-| Gold Ops | #ffd700 | #ffff00 | #ffff00 |
-| Founder Black | #6b7d8f | #8fa3b8 | #8fa3b8 |
-| PHANTOM ELITE | #a978ff | #d9b3ff | #d9b3ff |
+**Other Console Elements**: Skin-coordinated accent colors for frame borders, button highlights, and HUD elements (no grenade button variation by skin).
 
 ## Haptic Feedback Patterns
 

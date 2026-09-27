@@ -171,30 +171,31 @@ body.zs52-playing #app{visibility:hidden!important;pointer-events:none!important
   aspect-ratio:auto!important
 }
 
-/* Grenade button: positioned in bottom control panel (not centered on screen) */
+/* Grenade button: ALWAYS yellow with blue neon ring, positioned in control panel (not screen center) */
 .zs52-grenade{
-  --neon-idle:#0066ff;--neon-active:#00ddff;
   position:absolute!important;z-index:12!important;
   bottom:auto!important;top:auto!important;
   left:50%!important;transform:translateX(-50%)!important;
-  width:68px!important;height:68px!important;
+  width:6.8%!important;height:6.8%!important;
+  aspect-ratio:1!important;
   border-radius:50%!important;
   background:radial-gradient(circle at 34% 30%,#2c3234,#0a0d0e 70%);
-  border:2px solid var(--skin-accent,#ffff00);
+  border:2px solid #ffff00;
   color:#ffff00;display:grid;place-items:center;
-  transition:all .15s ease
+  transition:all .15s ease;
+  min-width:52px!important;min-height:52px!important
 }
 .mode-portrait .zs52-grenade{
-  bottom:calc(1.8% + 4px)!important;
+  bottom:calc(7.6% - 3.4%)!important
 }
 .zs52-grenade::before{
-  content:"";position:absolute;inset:-5px;border-radius:50%;
-  border:2px solid var(--neon-idle);
+  content:"";position:absolute;inset:-6px;border-radius:50%;
+  border:2px solid #0066ff;
   box-shadow:inset 0 0 8px rgba(0,102,255,.25),0 0 12px rgba(0,102,255,.35);
   opacity:.5;transition:all .2s ease;pointer-events:none
 }
 .zs52-grenade:not(.zs52-noammo)::before{
-  border-color:var(--neon-active);
+  border-color:#00ddff;
   opacity:1;
   box-shadow:inset 0 0 12px rgba(0,221,255,.45),0 0 18px rgba(0,221,255,.65),0 0 28px rgba(0,221,255,.4)
 }
@@ -205,19 +206,6 @@ body.zs52-playing #app{visibility:hidden!important;pointer-events:none!important
   border-color:rgba(150,150,150,.3);
   box-shadow:none;opacity:.3
 }
-
-/* Skin-coordinated grenade button colors */
-.skin-gunmetal .zs52-grenade{border-color:#c0c8ce}.skin-gunmetal .zs52-grenade::before{--neon-idle:#6b7d8f;--neon-active:#a8c5d9}
-.skin-hazard .zs52-grenade{border-color:#f2cf20;color:#f2cf20}.skin-hazard .zs52-grenade::before{--neon-idle:#ffc000;--neon-active:#ffea00}
-.skin-neon .zs52-grenade{border-color:#34d6ff;color:#34d6ff}.skin-neon .zs52-grenade::before{--neon-idle:#00ddff;--neon-active:#00ffff}
-.skin-jacko .zs52-grenade{border-color:#ff7b19;color:#ff7b19}.skin-jacko .zs52-grenade::before{--neon-idle:#ff6600;--neon-active:#ffaa00}
-.skin-milspec .zs52-grenade{border-color:#778c4c;color:#778c4c}.skin-milspec .zs52-grenade::before{--neon-idle:#7fa347;--neon-active:#a8d262}
-.skin-arcade .zs52-grenade{border-color:#ee42b5;color:#ee42b5}.skin-arcade .zs52-grenade::before{--neon-idle:#dd3399;--neon-active:#ff66dd}
-.skin-blood .zs52-grenade{border-color:#cf332c;color:#cf332c}.skin-blood .zs52-grenade::before{--neon-idle:#ff4444;--neon-active:#ff7777}
-.skin-toxic .zs52-grenade{border-color:#75f52d;color:#75f52d}.skin-toxic .zs52-grenade::before{--neon-idle:#75f52d;--neon-active:#a8ff5d}
-.skin-gold .zs52-grenade{border-color:#f4d229;color:#f4d229}.skin-gold .zs52-grenade::before{--neon-idle:#ffdd00;--neon-active:#ffff00}
-.skin-founders .zs52-grenade{border-color:#d8bd43;color:#d8bd43}.skin-founders .zs52-grenade::before{--neon-idle:#8fa3b8;--neon-active:#c5d9e8}
-.skin-phantom .zs52-grenade{border-color:#a978ff;color:#a978ff}.skin-phantom .zs52-grenade::before{--neon-idle:#a978ff;--neon-active:#d9b3ff}
 
 /* Menu and Pause buttons in bottom control panel */
 .zs52-topbtn{
@@ -239,18 +227,18 @@ body.zs52-playing #app{visibility:hidden!important;pointer-events:none!important
   transform:scale(.92)!important;filter:brightness(.82)!important
 }
 
-/* Move zone positioning in portrait */
+/* Move zone positioning in portrait (top of control panel) */
 .mode-portrait .zs52-move-zone{
-  position:absolute!important;left:3%!important;bottom:calc(1.8% + 78px)!important;
-  width:22%!important;height:11%!important;
+  position:absolute!important;left:3%!important;bottom:10.2%!important;
+  width:22%!important;height:4.8%!important;
   display:grid!important;place-items:center!important
 }
 .mode-portrait .zs52-move-zone.flipped{left:auto!important;right:3%!important}
 
-/* Fire button positioning in portrait */
+/* Fire button positioning in portrait (top right of control panel) */
 .mode-portrait .zs52-fire{
-  position:absolute!important;right:3%!important;bottom:calc(1.8% + 72px)!important;
-  width:22%!important;height:14%!important
+  position:absolute!important;right:3%!important;bottom:10.2%!important;
+  width:22%!important;height:4.8%!important
 }
 .mode-portrait .zs52-fire.flipped{right:auto!important;left:3%!important}
 
@@ -258,7 +246,7 @@ body.zs52-playing #app{visibility:hidden!important;pointer-events:none!important
 @media(max-width:480px){
   .zs52-topbtn{font-size:10px!important;padding:0 8px!important;min-width:70px!important;height:42px!important}
   .zs52-topbtn .material-symbols-rounded{font-size:16px}
-  .mode-portrait .zs52-move-zone{width:20%!important;height:9.5%!important}
-  .mode-portrait .zs52-fire{width:20%!important;height:11%!important}
-  .zs52-grenade{width:56px!important;height:56px!important}.zs52-grenade::before{border-width:1.5px;inset:-3px}
+  .mode-portrait .zs52-move-zone{width:20%!important;height:4.4%!important}
+  .mode-portrait .zs52-fire{width:20%!important;height:4.4%!important}
+  .zs52-grenade{min-width:48px!important;min-height:48px!important}.zs52-grenade::before{border-width:1.5px;inset:-3px}
 }
