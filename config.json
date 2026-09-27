@@ -27,17 +27,23 @@
     "Fixed aspect ratio locked to iPhone SE (9:16 portrait / 16:9 landscape)",
     "HUD with map-color-coordinated borders (six unique map color schemes)",
     "Joey Rob positioned above bottom HUD bar, fully visible in gameplay",
-    "Black border bars with responsive grid layout for info display"
+    "Black border bars with responsive grid layout for info display",
+    "Comic-style boss intro animations with character slide-on effects",
+    "Enhanced scene presentation with synchronized character movements",
+    "UI locked during boss intro and critical transitions"
   ],
   "notes": [
     "Phase A: Renamed modes (Classic/Adventure), locked Adventure until Dr Mantis defeat, added admin cheat menu",
     "Phase B: Built retro joystick-navigable pause menu, replaced Dr Mantis stage-2 adds with body-part sprites",
     "Phase C: Adventure mode omnidirectional movement and 8-way aiming, walk-on intro, side-entry zombies",
-    "Phase D: Fixed aspect ratio layout based on iPhone SE, map-color-coordinated HUD borders, repositioned Joey Rob",
+    "Phase D: Fixed aspect ratio, HUD redesign with map colors, boss intro animations, UI locking during transitions",
     "All movement input updates aim direction in landscape mode (joystick, arrow keys, button directions)",
     "Player sprite rotates to face aim direction; landscape zombies enter from right, breach on left edge",
     "Hardened direct calls with Realtime plus polling signaling fallback and TURN relay fallback",
-    "HUD bottom bar has 4 columns: grenades, lives (hearts), weapon+ammo, map name with map-specific border colors"
+    "HUD bottom bar: 4 columns (grenades, lives, weapon+ammo, map) with map-specific border colors",
+    "Boss intro: enhanced animations with character slide-on effects, scene progression, UI locked during cinematic",
+    "Tease phase (3.2s): Joey Rob slides in from left, fades in boss portrait from right, speech bubbles appear",
+    "Reveal phase (2.4s): Boss name and title animate in, announcement bubble displayed before combat begins"
   ],
   "callSystem": {
     "direct": "WebRTC app-to-app call",
