@@ -4,7 +4,7 @@
   "backendStatus": "configured-and-hardened",
   "auth": "email/password + pre-wired Google, Apple, Discord and X OAuth; providers activate when configured in Supabase. Sign-in is required before the app can be explored - a game-tease auth gate replaces the whole app until the visitor signs in or creates an account.",
   "adminCode": "configured server-side; not stored in this file",
-  "build": "5.20.0-joystick-cheat-sequences",
+  "build": "5.21.0-adventure-lock-phase-a",
   "hosting": "Vercel-ready static PWA; Supabase is the shared backend",
   "artwork": [
     "community-arena-main.png",
@@ -67,6 +67,11 @@
       "GOLDHEARTS - 10 lives, 5 of them gold",
       "ELITE - unlocks the Phantom Elite console skin"
     ],
-    "cheatRunsOnLeaderboard": false
+    "cheatRunsOnLeaderboard": false,
+    "adminCheatMenu": "Menu > Admin tab lists every cheat with a one-tap action button (admin access only)"
+  },
+  "gameModes": {
+    "classic": {"label": "Classic Play", "orientation": "portrait", "unlock": "always available"},
+    "adventure": {"label": "Adventure Play", "orientation": "landscape", "unlock": "unlocked by defeating Dr Mantis in Classic Play, or admin access", "status": "control layout + lock/unlock shipped; new side-scrolling gameplay in progress"}
   }
 }
