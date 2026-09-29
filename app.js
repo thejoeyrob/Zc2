@@ -128,15 +128,18 @@ async function init(){
   if(!isStandalone()&&!previewMode()){renderInstallGate();return;}
   const requestedPage=incoming.get('page');if(['home','tournaments','arcade','league','chat','profile','community','gallery'].includes(requestedPage))state.page=requestedPage;
   await loadOAuthProviderStatus();
-  const {data:{session}}=await supabase.auth.getSession();state.session=session;window.ZC2Arcade?.init({supabase,getState:()=>state,icon,esc,setToast,refreshAll});
+  try{const sess=await withTimeout(supabase.auth.getSession(),5000);state.session=sess.data?.session||null;}catch(e){console.warn('auth.getSession:',e);state.session=null;}
+  window.ZC2Arcade?.init({supabase,getState:()=>state,icon,esc,setToast,refreshAll});
   state.showIntro=localStorage.getItem('zc2-intro-v4')!=='1';
-  supabase.auth.onAuthStateChange(async(event,session)=>{state.session=session;if(event==='SIGNED_OUT')state.admin=false;if(event==='PASSWORD_RECOVERY'){state.authRecovery=true;state.modal={type:'auth',mode:'recovery'};}await refreshAll();subscribeCommunityFeed();await handlePendingInvite();render();});
-  await refreshAll();subscribeCommunityFeed();await handlePendingInvite();render();if(state.showIntro)scheduleIntroClose();
+  supabase.auth.onAuthStateChange(async(event,session)=>{state.session=session;if(event==='SIGNED_OUT')state.admin=false;if(event==='PASSWORD_RECOVERY'){state.authRecovery=true;state.modal={type:'auth',mode:'recovery'};}try{await withTimeout(refreshAll(),8000);}catch(e){console.warn('refreshAll in auth state change:',e);}subscribeCommunityFeed();try{await withTimeout(handlePendingInvite(),5000);}catch(e){console.warn('handlePendingInvite in auth state change:',e);}render();});
+  try{await withTimeout(refreshAll(),8000);}catch(e){console.warn('Initial refreshAll:',e);}
+  subscribeCommunityFeed();try{await withTimeout(handlePendingInvite(),5000);}catch(e){console.warn('Initial handlePendingInvite:',e);}
+  render();if(state.showIntro)scheduleIntroClose();
 }
 
 async function loadOAuthProviderStatus(){
   try{
-    const r=await fetch(SUPABASE_URL+'/auth/v1/settings',{headers:{apikey:SUPABASE_KEY}});
+    const r=await withTimeout(fetch(SUPABASE_URL+'/auth/v1/settings',{headers:{apikey:SUPABASE_KEY}}),3000);
     if(!r.ok)return;
     const data=await r.json();
     const ext=data?.external||{};
@@ -146,16 +149,17 @@ async function loadOAuthProviderStatus(){
       twitter:!!ext.twitter,
       discord:!!ext.discord
     };
-  }catch{}
+  }catch(e){console.warn('OAuth provider status load:',e);}
 }
 
 function oauthReturnUrl(){
   return baseUrl();
 }
 
+function withTimeout(promise,ms=8000){return Promise.race([promise,new Promise((_,reject)=>setTimeout(()=>reject(new Error('Timeout')),ms))]);}
 async function refreshAll(){
-  await loadPublic();
-  if(state.session) await loadPrivate(); else clearPrivate();
+  try{await withTimeout(loadPublic(),8000);}catch(e){console.warn('loadPublic timeout/error',e);}
+  if(state.session){try{await withTimeout(loadPrivate(),8000);}catch(e){console.warn('loadPrivate timeout/error',e);}}else clearPrivate();
 }
 
 function clearPrivate(){
@@ -167,46 +171,51 @@ function clearPrivate(){
 }
 
 async function loadPublic(){
-  const [t,p,l,e,g,a]=await Promise.all([
-    supabase.from('tournaments').select('*').eq('visibility','public').order('featured',{ascending:false}).order('created_at',{ascending:false}),
-    supabase.from('profiles').select('*').order('gamertag'),
-    supabase.from('league_stats').select('*').order('adjusted_kills',{ascending:false}).order('raw_kills',{ascending:false}),
-    supabase.from('tournament_entries').select('tournament_id,user_id,status,joined_at'),
-    supabase.from('gallery_items').select('*').order('created_at',{ascending:false}).limit(60),
-    supabase.rpc('get_arcade_leaderboard',{p_limit:250})
+  const [t,p,l,e,g,a]=await Promise.allSettled([
+    withTimeout(supabase.from('tournaments').select('*').eq('visibility','public').order('featured',{ascending:false}).order('created_at',{ascending:false}),5000),
+    withTimeout(supabase.from('profiles').select('*').order('gamertag'),5000),
+    withTimeout(supabase.from('league_stats').select('*').order('adjusted_kills',{ascending:false}).order('raw_kills',{ascending:false}),5000),
+    withTimeout(supabase.from('tournament_entries').select('tournament_id,user_id,status,joined_at'),5000),
+    withTimeout(supabase.from('gallery_items').select('*').order('created_at',{ascending:false}).limit(60),5000),
+    withTimeout(supabase.rpc('get_arcade_leaderboard',{p_limit:250}),5000)
   ]);
-  let tournaments=t.data||[];if(!tournaments.some(x=>x.id===FOUNDERS_ID))tournaments=[foundersFallback(),...tournaments];
-  state.tournaments=tournaments;state.profiles=p.data||[];state.league=l.data||[];state.entries=e.data||[];state.gallery=g.data||[];state.arcadeLeague=a.error?[]:(a.data||[]);
-  if(a.error||!state.arcadeLeague.length){const fallback=await supabase.from('arcade_profiles').select('user_id,high_score,selected_skin');if(!fallback.error)state.arcadeLeague=(fallback.data||[]).map(r=>({user_id:r.user_id,high_score:r.high_score||0,selected_skin:r.selected_skin||'gunmetal'})).sort((x,y)=>Number(y.high_score||0)-Number(x.high_score||0));}
+  let tournaments=(t.status==='fulfilled'?t.value:null)?.data||[];if(!tournaments.some(x=>x.id===FOUNDERS_ID))tournaments=[foundersFallback(),...tournaments];
+  state.tournaments=tournaments;state.profiles=(p.status==='fulfilled'?p.value:null)?.data||[];state.league=(l.status==='fulfilled'?l.value:null)?.data||[];state.entries=(e.status==='fulfilled'?e.value:null)?.data||[];state.gallery=(g.status==='fulfilled'?g.value:null)?.data||[];state.arcadeLeague=(a.status==='fulfilled'?a.value?.data:[]);
+  if(!state.arcadeLeague.length){try{const fallback=await withTimeout(supabase.from('arcade_profiles').select('user_id,high_score,selected_skin'),5000);if(fallback?.data)state.arcadeLeague=fallback.data.map(r=>({user_id:r.user_id,high_score:r.high_score||0,selected_skin:r.selected_skin||'gunmetal'})).sort((x,y)=>Number(y.high_score||0)-Number(x.high_score||0));}catch(e){console.warn('Arcade fallback:',e);}}
   else state.arcadeLeague=[...state.arcadeLeague].sort((x,y)=>Number(y.high_score||0)-Number(x.high_score||0));
-  if(t.error)console.warn('Tournament feed:',t.error.message);if(p.error)console.warn('Profiles:',p.error.message);if(l.error)console.warn('League:',l.error.message);if(e.error)console.warn('Tournament registrations:',e.error.message);if(g.error)console.warn('Gallery:',g.error.message);
 }
 
 async function loadPrivate(){
   const uid=state.session.user.id;
-  let p=await supabase.from('profiles').select('*').eq('id',uid).maybeSingle();
+  let p=null;
+  try{p=await withTimeout(supabase.from('profiles').select('*').eq('id',uid).maybeSingle(),5000);}catch(e){console.warn('loadPrivate profile load:',e);}
   const needsSetup={gamertag:false,profilePicture:false};
-  if(!p.data){
-    const meta=state.session.user.user_metadata||{};const raw=(meta.gamertag||state.session.user.email?.split('@')[0]||'Player').replace(/[^A-Za-z0-9_. -]/g,'').slice(0,24)||'Player';
-    const gamertag=raw+'-'+uid.slice(0,4).toUpperCase();
-    const profile_picture=getRandomZombie().file;
-    await supabase.from('profiles').upsert({id:uid,gamertag,platform:meta.platform||'Quest',profile_picture},{onConflict:'id'});p=await supabase.from('profiles').select('*').eq('id',uid).maybeSingle();
+  if(!p?.data){
+    try{
+      const meta=state.session.user.user_metadata||{};const raw=(meta.gamertag||state.session.user.email?.split('@')[0]||'Player').replace(/[^A-Za-z0-9_. -]/g,'').slice(0,24)||'Player';
+      const gamertag=raw+'-'+uid.slice(0,4).toUpperCase();
+      const profile_picture=getRandomZombie().file;
+      await withTimeout(supabase.from('profiles').upsert({id:uid,gamertag,platform:meta.platform||'Quest',profile_picture},{onConflict:'id'}),5000);
+      p=await withTimeout(supabase.from('profiles').select('*').eq('id',uid).maybeSingle(),5000);
+    }catch(e){console.warn('loadPrivate profile create:',e);}
   }else{
     if(!p.data.gamertag||p.data.gamertag.endsWith('-'+uid.slice(0,4).toUpperCase())){needsSetup.gamertag=true;}
-    if(!p.data.profile_picture){needsSetup.profilePicture=true;if(!needsSetup.gamertag){const zombie=getRandomZombie();await supabase.from('profiles').update({profile_picture:zombie.file}).eq('id',uid);p.data.profile_picture=zombie.file;}else{const zombie=getRandomZombie();p.data.profile_picture=zombie.file;}}
+    if(!p.data.profile_picture){needsSetup.profilePicture=true;if(!needsSetup.gamertag){const zombie=getRandomZombie();try{await withTimeout(supabase.from('profiles').update({profile_picture:zombie.file}).eq('id',uid),5000);}catch(e){console.warn('profile picture update:',e);}p.data.profile_picture=zombie.file;}else{const zombie=getRandomZombie();p.data.profile_picture=zombie.file;}}
   }
-  const [a,n,priv,threads]=await Promise.all([
-    supabase.from('admins').select('user_id').eq('user_id',uid).maybeSingle(),
-    supabase.from('user_notifications').select('*').eq('user_id',uid).order('created_at',{ascending:false}).limit(80),
-    supabase.from('tournaments').select('*').eq('visibility','private').order('created_at',{ascending:false}),
-    supabase.from('dm_threads').select('*').order('created_at',{ascending:false}).limit(60)
+  const [a,n,priv,threads]=await Promise.allSettled([
+    withTimeout(supabase.from('admins').select('user_id').eq('user_id',uid).maybeSingle(),3000),
+    withTimeout(supabase.from('user_notifications').select('*').eq('user_id',uid).order('created_at',{ascending:false}).limit(80),5000),
+    withTimeout(supabase.from('tournaments').select('*').eq('visibility','private').order('created_at',{ascending:false}),5000),
+    withTimeout(supabase.from('dm_threads').select('*').order('created_at',{ascending:false}).limit(60),5000)
   ]);
   const keepAdminSession=state.admin===true;
-  state.profile=p.data||null;state.admin=keepAdminSession;state.notifications=n.data||[];state.privateEvents=priv.data||[];state.dmThreads=threads.data||[];
+  state.profile=p?.data||null;state.admin=keepAdminSession;state.notifications=(n.status==='fulfilled'?n.value:null)?.data||[];state.privateEvents=(priv.status==='fulfilled'?priv.value:null)?.data||[];state.dmThreads=(threads.status==='fulfilled'?threads.value:null)?.data||[];
   if(needsSetup.gamertag){state.modal={type:'gamertag'};}else if(needsSetup.profilePicture){state.modal={type:'profilePicture'};}
-  await loadFeaturedPortal();subscribeNotifications();subscribeCallSignals();
-  await loadChatUnread();subscribeChatActivity();
-  await autoUpdateProfiles();
+  try{await withTimeout(loadFeaturedPortal(),5000);}catch(e){console.warn('loadFeaturedPortal:',e);}
+  subscribeNotifications();subscribeCallSignals();
+  try{await withTimeout(loadChatUnread(),5000);}catch(e){console.warn('loadChatUnread:',e);}
+  subscribeChatActivity();
+  try{await withTimeout(autoUpdateProfiles(),5000);}catch(e){console.warn('autoUpdateProfiles:',e);}
 }
 
 function chatSeenKey(){return state.session?`zc2-chat-seen-${state.session.user.id}`:null;}
@@ -299,8 +308,8 @@ async function handlePendingInvite(){
   if(!tid||!invite)return;
   if(!state.session){state.modal={type:'auth',pendingInvite:{tid,invite}};return;}
   try{
-    const {error}=await supabase.rpc('join_tournament',{p_tournament:tid,p_invite:invite});if(error)throw error;
-    localStorage.removeItem('zc2-pending-invite');history.replaceState({},'',baseUrl());setToast('Private tournament joined.');await refreshAll();
+    const {error}=await withTimeout(supabase.rpc('join_tournament',{p_tournament:tid,p_invite:invite}),5000);if(error)throw error;
+    localStorage.removeItem('zc2-pending-invite');history.replaceState({},'',baseUrl());setToast('Private tournament joined.');try{await withTimeout(refreshAll(),8000);}catch(e){console.warn('refreshAll after invite:',e);}
   }catch(e){setToast(e.message||'Invite could not be joined.');}
 }
 
