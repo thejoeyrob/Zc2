@@ -117,3 +117,8 @@ All character, boss, pickup, projectile, control and HUD art below is supplied a
 - `console-shell-elite.jpg` — 1024×1024 — 175 KB
 - `console-shell-premium.jpg` — 1024×1024 — 215 KB
 
+
+
+## 6.0.1 additions
+
+New illustrated cover/Home Screen icons, rendered scrolling street and nine weapon sprites (including Debo’s gold diamond D chain end). Four original synthesized soundtrack files are bundled locally. The existing named boss, player, enemy, skin and community artwork remains included. See asset-manifest.json for current file hashes.

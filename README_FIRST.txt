@@ -1,25 +1,13 @@
-ZC2 COMMUNITY ARENA v5.9.0 — MINI BATTLE ART / BOSS STAGING
+ZOMBIE SMASH / ZC2 ARENA — 6.0.1
 
-UPLOAD:
-Upload every file from this ZIP directly to the existing GitHub repository root.
-Do not create an extra enclosing folder.
+This is the complete flat PWA package. Extract and upload ALL files together to
+the website root. index.html must not be inside an extra package subfolder.
+No npm install or build command is needed. Use HTTPS.
 
-GAMEPLAY DIRECTION:
-- Portrait remains intentional.
-- Joey Rob is at the bottom, visually facing north/up.
-- Fire travels straight north/up.
-- Zombies and bosses face/advance south/down.
-- Existing left/right/fire interaction, collision sizes, wave logic and leaderboard hooks remain intact.
+Read README.md for deployment, the existing profile migration, controls and
+verification limits. Do not run old cleanup scripts or remove database tables.
 
-BOSSES:
-1. Fat Amy — first score-threshold boss — 3 visual damage states
-2. Glowing Humanity — score threshold — 2 states
-3. Debo — score threshold — 2 states
-4. Jordan — score threshold — 2 states
-5. Dr Mantis — enters when the infinite wave starts — 3 states
-
-PERFORMANCE:
-War damage uses four composited map overlays, not per-zombie persistent splatter objects.
-Rendered PNGs have been web-optimized while preserving alpha transparency.
-
-No Claude handoff is required for this build: the assets are already integrated into `arcade.js` and `arcade.css`.
+Latest upstream reviewed and merged: d2c2d16.
+Classic remains vertical with left/right movement.
+Adventure has omnidirectional movement and scrolling streets.
+Both use the existing app identity; there is no separate arcade account.

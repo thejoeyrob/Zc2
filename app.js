@@ -1,9 +1,9 @@
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+import { createClient } from './supabase-vendor.js';
 
 const SUPABASE_URL = 'https://xdsrnnkuxfaycnlngjbq.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_AicVoQAwV-KnlOs1Fc2RuQ_T81In0MC';
 const FOUNDERS_ID = '5adc5ebc-d73e-4226-bf18-c303c038b294';
-const BUILD = '5.14.0-messages-unread-badge';
+const BUILD = '6.0.1-zombie-smash';
 const REMEMBER_EMAIL_KEY='zc2-remember-email';
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
   auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
@@ -18,7 +18,7 @@ const icon = (name, extra='') => `<span class="material-symbols-rounded ${extra}
 
 const state = {
   session:null, profile:null, admin:false, tournaments:[], entries:[], profiles:[], league:[], arcadeLeague:[], gallery:[],
-  notifications:[], privateEvents:[], page:'home', selectedTournament:null, board:[], portal:null,
+  notifications:[], privateEvents:[], page:'arcade', selectedTournament:null, board:[], portal:null,
   chatRoom:'general', chat:[], chatChannel:null, dmTarget:null, dmThread:null, dmMessages:[], dmChannel:null,
   notificationsChannel:null, communityFeedChannel:null, callSignalChannel:null, callSignalPoll:null, callSeenSignals:new Set(), installPrompt:null, toast:'', modal:null, ocrProgress:0, adminData:null,
   featuredPortal:null, communitySearch:'', authRecovery:false, oauthProviders:{google:false,apple:false,twitter:false,discord:false},
@@ -46,52 +46,13 @@ const formatHelp = {
   'Marksman':'Accuracy-focused competition. Use end-screen evidence and organiser verification.'
 };
 
-const profilePictures={
-  bosses:[
-    {name:'Caffeinated Sloth',file:'Caffeinated Sloth.webp'},
-    {name:'Dr Mantis - Stage 1',file:'Dr Mantis - Stage 1.webp'},
-    {name:'Dr Mantis - Stage 2',file:'Dr Mantis - Stage 2.webp'},
-    {name:'Dr Mantis - Final Form',file:'Dr Mantis - Final Form.webp'},
-    {name:'Fat Amy - Stage 1',file:'Fat Amy - Stage 1.webp'},
-    {name:'Fat Amy - Stage 2',file:'Fat Amy - Stage 2.webp'},
-    {name:'Fat Amy - Stage 3',file:'Fat Amy - Stage 3.webp'},
-    {name:'Debo - Stage 1',file:'Debo - Stage 1.webp'},
-    {name:'Debo - Stage 2',file:'Debo - Stage 2.webp'},
-    {name:'Glowing Humanity - Stage 1',file:'Glowing Humanity - Stage 1.webp'},
-    {name:'Glowing Humanity - Stage 2',file:'Glowing Humanity - Stage 2.webp'}
-  ],
-  zombies:[
-    {name:'Armored Zombie',file:'Armored Zombie.webp'},
-    {name:'Brute Zombie',file:'Brute Zombie.webp'},
-    {name:'Fire Axe Zombie',file:'Fire Axe Zombie.webp'},
-    {name:'Inferno Fire Axe Zombie',file:'Inferno Fire Axe Zombie.webp'},
-    {name:'Purple Tank Zombie',file:'Purple Tank Zombie.webp'},
-    {name:'Runner Zombie',file:'Runner Zombie.webp'},
-    {name:'Soldier Zombie',file:'Soldier Zombie.webp'},
-    {name:'Spiked Rager Zombie',file:'Spiked Rager Zombie.webp'},
-    {name:'Toxic Hazmat Zombie',file:'Toxic Hazmat Zombie.webp'},
-    {name:'Walker Zombie',file:'Walker Zombie.webp'}
-  ]
-};
-
-function getRandomZombie(){const all=profilePictures.zombies;return all[Math.floor(Math.random()*all.length)];}
-function profilePictureUrl(file){return `./public/profiles/${encodeURIComponent(file)}`;}
-const autoUpdateProfiles={'caffeinated sloth':'Caffeinated Sloth.webp','dr botty':'Dr Mantis - Stage 1.webp'};
-
 function setToast(msg){ state.toast=msg; renderToast(); clearTimeout(setToast.t); setToast.t=setTimeout(()=>{state.toast='';renderToast();},4200); }
 function renderToast(){ let t=$('.toast'); if(!state.toast){t?.remove();return;} if(!t){t=document.createElement('div');t.className='toast';document.body.appendChild(t);} t.innerHTML=`${icon('info')}<span>${esc(state.toast)}</span>`; }
 
 function publicAvatar(profile){
-  if(profile?.profile_picture_custom){
-    return supabase.storage.from('avatars').getPublicUrl(profile.profile_picture_custom).data.publicUrl;
-  }
-  if(profile?.profile_picture&&!profile.profile_picture.includes('/')){
-    return profilePictureUrl(profile.profile_picture);
-  }
-  if(profile?.avatar_path){
-    return supabase.storage.from('avatars').getPublicUrl(profile.avatar_path).data.publicUrl;
-  }
-  return '';
+  const character=window.ZSCharacters?.find(profile?.profile_picture);
+  if(character)return './'+character.img;
+  return profile?.avatar_path?supabase.storage.from('avatars').getPublicUrl(profile.avatar_path).data.publicUrl:'';
 }
 function galleryUrl(path){ return supabase.storage.from('gallery-public').getPublicUrl(path).data.publicUrl; }
 function playerById(id){ return state.profiles.find(p=>p.id===id); }
@@ -100,7 +61,7 @@ function entryCount(id){ return state.entries.filter(e=>e.tournament_id===id).le
 function isJoined(id){ return !!state.session && state.entries.some(e=>e.tournament_id===id && e.user_id===state.session.user.id); }
 
 function isStandalone(){return window.matchMedia?.('(display-mode: standalone)').matches||window.navigator.standalone===true;}
-function previewMode(){return new URLSearchParams(location.search).get('preview')==='1';}
+function previewMode(){return new URLSearchParams(location.search).get('preview')==='1'||sessionStorage.getItem('zs6-preview')==='1';}
 function installInstructions(){
   const ua=navigator.userAgent||'';
   if(/iPhone|iPad|iPod/i.test(ua))return ['Open this page in Safari','Tap Share','Choose Add to Home Screen','Open Community Arena from the new icon'];
@@ -109,11 +70,12 @@ function installInstructions(){
   return ['Use Chrome or Edge','Click the install icon in the address bar or browser menu','Choose Install','Launch Community Arena as an app'];
 }
 function installGateHtml(){
-  const steps=installInstructions();
-  return `<div class="install-gate"><div class="install-gate-bg"></div><div class="install-card"><img class="install-emblem" src="./community-arena-emblem.png?v=4" alt=""><span class="kicker">COMMUNITY ARENA PWA</span><h1>INSTALL TO ENTER</h1><p>Community Arena is designed to run as an installed app on phone, tablet, desktop and supported VR browsers. Browser access to the community workspace is intentionally blocked.</p><ol>${steps.map(x=>`<li>${esc(x)}</li>`).join('')}</ol><button class="btn primary big" id="gateInstallBtn" ${state.installPrompt?'':'disabled'}>${icon('download')} ${state.installPrompt?'Install Community Arena':'Use your browser menu to install'}</button><small>Already installed? Open Community Arena from its app icon. Developers can add <b>?preview=1</b> to this URL for a browser preview.</small><img class="install-jw" src="./jw-eds-yellow.png?v=4" alt="Design and Production by JW"></div></div>`;
+ const steps=installInstructions().map(x=>x.replace(/Community Arena/g,'Zombie Smash'));
+ return `<main class="zs-install"><header class="zs-install-header"><a href="./" aria-label="Zombie Smash home"><img src="./icon-192.png" alt=""><b>ZC2 ARENA</b></a><a href="#install-how">HOW TO INSTALL ↗</a></header><section class="zs-install-hero"><div class="zs-install-art"><img src="./adventure-street.webp" alt="The streets of Zombie Smash"><img class="zs-ad-mantis" src="./boss-drmantis-stage3.png" alt="Dr Mantis"><img class="zs-ad-joey" src="./player-right-fire.png" alt="Joey Rob"><div class="zs-install-shade"></div></div><div class="zs-install-pitch"><h1>THE HORDE<br>IS WAITING.</h1><p>Be Joey Rob. Break the experiments.<br>Take down Dr Mantis.</p><div class="zs-install-actions"><button class="zs6-play" id="gateInstallBtn">${icon('download')}INSTALL ZOMBIE SMASH</button><button id="previewGameBtn">TRY THE GAME FIRST ${icon('play_arrow')}</button></div><span class="zs-install-note">Two ways to play. Six bosses to bring down.</span></div></section><section class="zs-install-modes"><article><img src="./player-right-fire.png" alt="Joey Rob firing"><div><h2>HOLD THE LINE.</h2><p>Classic: move left and right, shoot upward and chase your next score boost.</p></div></article><article><img src="./boss-debo-stage2.png" alt="Debo, one of six bosses"><div><h2>TAKE THE STREETS.</h2><p>Adventure: free movement, scrolling streets, dodge escapes and close-range smashes.</p></div></article></section><section class="zs-install-how" id="install-how"><div><h2>YOUR NEXT GAME.<br>ONE TAP AWAY.</h2><p>Add Zombie Smash to your Home Screen for fullscreen play and a quick return to your saved run.</p><img src="./icon-192.png" alt="Zombie Smash app icon" width="86" height="86"></div><ol>${steps.map((x,i)=>`<li><b>0${i+1}</b><span>${esc(x)}</span></li>`).join('')}</ol></section><footer class="zs-install-footer">ZOMBIE SMASH · ZC2 COMMUNITY ARENA<button id="previewFooterBtn">Open game →</button></footer></main>`;
 }
-function renderInstallGate(){const app=$('#app');if(app){app.className='';app.innerHTML=installGateHtml();$('#gateInstallBtn')?.addEventListener('click',async()=>{if(!state.installPrompt)return;state.installPrompt.prompt();await state.installPrompt.userChoice;});}}
-function introHtml(){if(!state.showIntro)return '';return `<div class="arena-intro" id="arenaIntro"><div class="intro-bg"></div><div class="intro-grid"></div><div class="intro-core"><div class="intro-halo"></div><img class="intro-emblem" src="./community-arena-emblem.png?v=4" alt=""><div class="intro-wordmark"><span>ZERO CALIBER <b>2</b></span><em>COMMUNITY ARENA</em></div><div class="intro-strike"></div><img class="intro-jw" src="./jw-eds-yellow.png?v=4" alt="Design and Production by JW"></div><button id="skipIntroBtn" class="intro-skip">SKIP</button></div>`;}
+function renderInstallGate(){const app=$('#app');if(!app)return;app.className='';app.innerHTML=installGateHtml();const preview=()=>{sessionStorage.setItem('zs6-preview','1');state.page='arcade';state.modal=null;render()};$('#previewGameBtn')?.addEventListener('click',preview);$('#previewFooterBtn')?.addEventListener('click',preview);$('#gateInstallBtn')?.addEventListener('click',async()=>{if(state.installPrompt){await state.installPrompt.prompt();await state.installPrompt.userChoice;}else{$('#install-how')?.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});$('#install-how')?.setAttribute('tabindex','-1');$('#install-how')?.focus({preventScroll:true})}});}
+
+function introHtml(){if(!state.showIntro)return '';return `<div class="arena-intro" id="arenaIntro"><div class="intro-bg"></div><div class="intro-grid"></div><div class="intro-core"><div class="intro-halo"></div><img class="intro-emblem" src="./zc2-arena-logo.png" alt=""><div class="intro-wordmark"><span>ZERO CALIBER <b>2</b></span><em>COMMUNITY ARENA</em></div><div class="intro-strike"></div><img class="intro-jw" src="./jw-eds-yellow.png?v=4" alt="Design and Production by JW"></div><button id="skipIntroBtn" class="intro-skip">SKIP</button></div>`;}
 function replayIntro(){localStorage.removeItem('zc2-intro-v4');state.showIntro=true;state.modal=null;render();scheduleIntroClose();}
 function scheduleIntroClose(){clearTimeout(scheduleIntroClose.t);scheduleIntroClose.t=setTimeout(()=>{if(state.showIntro){state.showIntro=false;localStorage.setItem('zc2-intro-v4','1');render();}},3800);}
 function foundersFallback(){return {id:FOUNDERS_ID,title:'Season Zero: Founders League',subtitle:'The tournament that begins the permanent ZC2 Community league table.',visibility:'public',status:'registration',official:true,featured:true,unlimited_entries:true,max_players:null,current_round:0,format:'Founders League',rules:{bots:false,qualifiers:2,final_map:'Cargo'}};}
@@ -125,21 +87,19 @@ async function init(){
   window.addEventListener('appinstalled',()=>{state.installPrompt=null;setTimeout(()=>location.reload(),350);});
   const incoming=new URLSearchParams(location.search);if(incoming.get('tournament')&&incoming.get('invite'))localStorage.setItem('zc2-pending-invite',location.search);
   window.addEventListener('focus',()=>recoverRecentCallSignals());document.addEventListener('visibilitychange',()=>{if(!document.hidden)recoverRecentCallSignals();});
-  if(!isStandalone()&&!previewMode()){renderInstallGate();return;}
+  
   const requestedPage=incoming.get('page');if(['home','tournaments','arcade','league','chat','profile','community','gallery'].includes(requestedPage))state.page=requestedPage;
-  await loadOAuthProviderStatus();
-  try{const sess=await withTimeout(supabase.auth.getSession(),5000);state.session=sess.data?.session||null;}catch(e){console.warn('auth.getSession:',e);state.session=null;}
-  window.ZC2Arcade?.init({supabase,getState:()=>state,icon,esc,setToast,refreshAll});
-  state.showIntro=localStorage.getItem('zc2-intro-v4')!=='1';
-  supabase.auth.onAuthStateChange(async(event,session)=>{state.session=session;if(event==='SIGNED_OUT')state.admin=false;if(event==='PASSWORD_RECOVERY'){state.authRecovery=true;state.modal={type:'auth',mode:'recovery'};}try{await withTimeout(refreshAll(),8000);}catch(e){console.warn('refreshAll in auth state change:',e);}subscribeCommunityFeed();try{await withTimeout(handlePendingInvite(),5000);}catch(e){console.warn('handlePendingInvite in auth state change:',e);}render();});
-  try{await withTimeout(refreshAll(),8000);}catch(e){console.warn('Initial refreshAll:',e);}
-  subscribeCommunityFeed();try{await withTimeout(handlePendingInvite(),5000);}catch(e){console.warn('Initial handlePendingInvite:',e);}
-  render();if(state.showIntro)scheduleIntroClose();
+  window.ZC2Arcade?.init({supabase,getState:()=>state,icon,esc,setToast,refreshAll,selectCharacter:selectCharacterAvatar});render();
+  loadOAuthProviderStatus().catch(()=>{});
+  const {data:{session}}=await supabase.auth.getSession();state.session=session;if(session&&state.modal?.type==='auth'&&!state.authRecovery)state.modal=null;
+  state.showIntro=false;
+  supabase.auth.onAuthStateChange(async(event,session)=>{state.session=session;if(session&&state.modal?.type==='auth'&&event!=='PASSWORD_RECOVERY'&&!state.authRecovery)state.modal=null;if(event==='SIGNED_OUT')state.admin=false;if(event==='PASSWORD_RECOVERY'){state.authRecovery=true;state.modal={type:'auth',mode:'recovery'};}await refreshAll();subscribeCommunityFeed();await handlePendingInvite();render();});
+  await refreshAll();subscribeCommunityFeed();await handlePendingInvite();render();if(state.showIntro)scheduleIntroClose();
 }
 
 async function loadOAuthProviderStatus(){
   try{
-    const r=await withTimeout(fetch(SUPABASE_URL+'/auth/v1/settings',{headers:{apikey:SUPABASE_KEY}}),3000);
+    const r=await fetch(SUPABASE_URL+'/auth/v1/settings',{headers:{apikey:SUPABASE_KEY},signal:AbortSignal.timeout(7000)});
     if(!r.ok)return;
     const data=await r.json();
     const ext=data?.external||{};
@@ -149,17 +109,16 @@ async function loadOAuthProviderStatus(){
       twitter:!!ext.twitter,
       discord:!!ext.discord
     };
-  }catch(e){console.warn('OAuth provider status load:',e);}
+  }catch{}
 }
 
 function oauthReturnUrl(){
   return baseUrl();
 }
 
-function withTimeout(promise,ms=8000){return Promise.race([promise,new Promise((_,reject)=>setTimeout(()=>reject(new Error('Timeout')),ms))]);}
 async function refreshAll(){
-  try{await withTimeout(loadPublic(),8000);}catch(e){console.warn('loadPublic timeout/error',e);}
-  if(state.session){try{await withTimeout(loadPrivate(),8000);}catch(e){console.warn('loadPrivate timeout/error',e);}}else clearPrivate();
+  await loadPublic();
+  if(state.session) await loadPrivate(); else clearPrivate();
 }
 
 function clearPrivate(){
@@ -171,51 +130,38 @@ function clearPrivate(){
 }
 
 async function loadPublic(){
-  const [t,p,l,e,g,a]=await Promise.allSettled([
-    withTimeout(supabase.from('tournaments').select('*').eq('visibility','public').order('featured',{ascending:false}).order('created_at',{ascending:false}),5000),
-    withTimeout(supabase.from('profiles').select('*').order('gamertag'),5000),
-    withTimeout(supabase.from('league_stats').select('*').order('adjusted_kills',{ascending:false}).order('raw_kills',{ascending:false}),5000),
-    withTimeout(supabase.from('tournament_entries').select('tournament_id,user_id,status,joined_at'),5000),
-    withTimeout(supabase.from('gallery_items').select('*').order('created_at',{ascending:false}).limit(60),5000),
-    withTimeout(supabase.rpc('get_arcade_leaderboard',{p_limit:250}),5000)
+  const [t,p,l,e,g,a]=await Promise.all([
+    supabase.from('tournaments').select('*').eq('visibility','public').order('featured',{ascending:false}).order('created_at',{ascending:false}),
+    supabase.from('profiles').select('*').order('gamertag'),
+    supabase.from('league_stats').select('*').order('adjusted_kills',{ascending:false}).order('raw_kills',{ascending:false}),
+    supabase.from('tournament_entries').select('tournament_id,user_id,status,joined_at'),
+    supabase.from('gallery_items').select('*').order('created_at',{ascending:false}).limit(60),
+    supabase.from('profiles').select('id,gamertag,high_score,selected_skin').order('high_score',{ascending:false}).limit(250)
   ]);
-  let tournaments=(t.status==='fulfilled'?t.value:null)?.data||[];if(!tournaments.some(x=>x.id===FOUNDERS_ID))tournaments=[foundersFallback(),...tournaments];
-  state.tournaments=tournaments;state.profiles=(p.status==='fulfilled'?p.value:null)?.data||[];state.league=(l.status==='fulfilled'?l.value:null)?.data||[];state.entries=(e.status==='fulfilled'?e.value:null)?.data||[];state.gallery=(g.status==='fulfilled'?g.value:null)?.data||[];state.arcadeLeague=(a.status==='fulfilled'?a.value?.data:[]);
-  if(!state.arcadeLeague.length){try{const fallback=await withTimeout(supabase.from('arcade_profiles').select('user_id,high_score,selected_skin'),5000);if(fallback?.data)state.arcadeLeague=fallback.data.map(r=>({user_id:r.user_id,high_score:r.high_score||0,selected_skin:r.selected_skin||'gunmetal'})).sort((x,y)=>Number(y.high_score||0)-Number(x.high_score||0));}catch(e){console.warn('Arcade fallback:',e);}}
-  else state.arcadeLeague=[...state.arcadeLeague].sort((x,y)=>Number(y.high_score||0)-Number(x.high_score||0));
+  let tournaments=t.data||[];if(!tournaments.some(x=>x.id===FOUNDERS_ID))tournaments=[foundersFallback(),...tournaments];
+  state.tournaments=tournaments;state.profiles=p.data||[];state.league=l.data||[];state.entries=e.data||[];state.gallery=g.data||[];state.arcadeLeague=a.error?[]:(a.data||[]);
+  state.arcadeLeague=state.arcadeLeague.filter(r=>Number(r.high_score)>0).map(r=>({...r,user_id:r.id}));
+  if(t.error)console.warn('Tournament feed:',t.error.message);if(p.error)console.warn('Profiles:',p.error.message);if(l.error)console.warn('League:',l.error.message);if(e.error)console.warn('Tournament registrations:',e.error.message);if(g.error)console.warn('Gallery:',g.error.message);
 }
 
 async function loadPrivate(){
   const uid=state.session.user.id;
-  let p=null;
-  try{p=await withTimeout(supabase.from('profiles').select('*').eq('id',uid).maybeSingle(),5000);}catch(e){console.warn('loadPrivate profile load:',e);}
-  const needsSetup={gamertag:false,profilePicture:false};
-  if(!p?.data){
-    try{
-      const meta=state.session.user.user_metadata||{};const raw=(meta.gamertag||state.session.user.email?.split('@')[0]||'Player').replace(/[^A-Za-z0-9_. -]/g,'').slice(0,24)||'Player';
-      const gamertag=raw+'-'+uid.slice(0,4).toUpperCase();
-      const profile_picture=getRandomZombie().file;
-      await withTimeout(supabase.from('profiles').upsert({id:uid,gamertag,platform:meta.platform||'Quest',profile_picture},{onConflict:'id'}),5000);
-      p=await withTimeout(supabase.from('profiles').select('*').eq('id',uid).maybeSingle(),5000);
-    }catch(e){console.warn('loadPrivate profile create:',e);}
-  }else{
-    if(!p.data.gamertag||p.data.gamertag.endsWith('-'+uid.slice(0,4).toUpperCase())){needsSetup.gamertag=true;}
-    if(!p.data.profile_picture){needsSetup.profilePicture=true;if(!needsSetup.gamertag){const zombie=getRandomZombie();try{await withTimeout(supabase.from('profiles').update({profile_picture:zombie.file}).eq('id',uid),5000);}catch(e){console.warn('profile picture update:',e);}p.data.profile_picture=zombie.file;}else{const zombie=getRandomZombie();p.data.profile_picture=zombie.file;}}
+  let p=await supabase.from('profiles').select('*').eq('id',uid).maybeSingle();
+  if(!p.data){
+    const meta=state.session.user.user_metadata||{};const raw=(meta.gamertag||state.session.user.email?.split('@')[0]||'Player').replace(/[^A-Za-z0-9_. -]/g,'').slice(0,24)||'Player';
+    const gamertag=raw+'-'+uid.slice(0,4).toUpperCase();
+    await supabase.from('profiles').upsert({id:uid,gamertag,platform:meta.platform||'Quest',profile_picture:'jordan-1'},{onConflict:'id'});p=await supabase.from('profiles').select('*').eq('id',uid).maybeSingle();
   }
-  const [a,n,priv,threads]=await Promise.allSettled([
-    withTimeout(supabase.from('admins').select('user_id').eq('user_id',uid).maybeSingle(),3000),
-    withTimeout(supabase.from('user_notifications').select('*').eq('user_id',uid).order('created_at',{ascending:false}).limit(80),5000),
-    withTimeout(supabase.from('tournaments').select('*').eq('visibility','private').order('created_at',{ascending:false}),5000),
-    withTimeout(supabase.from('dm_threads').select('*').order('created_at',{ascending:false}).limit(60),5000)
+  const [a,n,priv,threads]=await Promise.all([
+    supabase.from('admins').select('user_id').eq('user_id',uid).maybeSingle(),
+    supabase.from('user_notifications').select('*').eq('user_id',uid).order('created_at',{ascending:false}).limit(80),
+    supabase.from('tournaments').select('*').eq('visibility','private').order('created_at',{ascending:false}),
+    supabase.from('dm_threads').select('*').order('created_at',{ascending:false}).limit(60)
   ]);
   const keepAdminSession=state.admin===true;
-  state.profile=p?.data||null;state.admin=keepAdminSession;state.notifications=(n.status==='fulfilled'?n.value:null)?.data||[];state.privateEvents=(priv.status==='fulfilled'?priv.value:null)?.data||[];state.dmThreads=(threads.status==='fulfilled'?threads.value:null)?.data||[];
-  if(needsSetup.gamertag){state.modal={type:'gamertag'};}else if(needsSetup.profilePicture){state.modal={type:'profilePicture'};}
-  try{await withTimeout(loadFeaturedPortal(),5000);}catch(e){console.warn('loadFeaturedPortal:',e);}
-  subscribeNotifications();subscribeCallSignals();
-  try{await withTimeout(loadChatUnread(),5000);}catch(e){console.warn('loadChatUnread:',e);}
-  subscribeChatActivity();
-  try{await withTimeout(autoUpdateProfiles(),5000);}catch(e){console.warn('autoUpdateProfiles:',e);}
+  state.profile=p.data||null;state.admin=keepAdminSession;state.notifications=n.data||[];state.privateEvents=priv.data||[];state.dmThreads=threads.data||[];
+  await loadFeaturedPortal();subscribeNotifications();subscribeCallSignals();
+  await loadChatUnread();subscribeChatActivity();
 }
 
 function chatSeenKey(){return state.session?`zc2-chat-seen-${state.session.user.id}`:null;}
@@ -308,14 +254,15 @@ async function handlePendingInvite(){
   if(!tid||!invite)return;
   if(!state.session){state.modal={type:'auth',pendingInvite:{tid,invite}};return;}
   try{
-    const {error}=await withTimeout(supabase.rpc('join_tournament',{p_tournament:tid,p_invite:invite}),5000);if(error)throw error;
-    localStorage.removeItem('zc2-pending-invite');history.replaceState({},'',baseUrl());setToast('Private tournament joined.');try{await withTimeout(refreshAll(),8000);}catch(e){console.warn('refreshAll after invite:',e);}
+    const {error}=await supabase.rpc('join_tournament',{p_tournament:tid,p_invite:invite});if(error)throw error;
+    localStorage.removeItem('zc2-pending-invite');history.replaceState({},'',baseUrl());setToast('Private tournament joined.');await refreshAll();
   }catch(e){setToast(e.message||'Invite could not be joined.');}
 }
 
 function render(){
-  if(!isStandalone()&&!previewMode()){renderInstallGate();return;}
-  if(!state.session){if(!state.modal||state.modal.type!=='auth')state.modal={type:'auth',mode:state.authRecovery?'recovery':'signin'};renderAuthGate();return;}
+  if(!isStandalone()&&!previewMode()&&!location.hash.includes('access_token')&&!new URLSearchParams(location.search).has('code')){renderInstallGate();return;}
+  
+  if(!state.session&&state.page!=='arcade'){if(!state.modal||state.modal.type!=='auth')state.modal={type:'auth',mode:state.authRecovery?'recovery':'signin'};renderAuthGate();return;}
   const app=$('#app');app.className='';
   app.innerHTML=`<div class="shell">${topbarHtml()}<div class="layout">${sidebarHtml()}<main class="main" id="main">${pageHtml()}</main></div></div>${drawerHtml()}${modalHtml()}${introHtml()}${callOverlayHtml()}`;
   bindCommon();bindPage();bindCallControls();renderToast();
@@ -323,13 +270,13 @@ function render(){
 function renderAuthGate(){
   const app=$('#app');app.className='';
   app.innerHTML=authGateHtml();
-  bindAuthModal();
+  bindAuthModal();$('#guestPlayBtn')?.addEventListener('click',()=>{state.page='arcade';state.modal=null;render()});
   renderToast();
 }
 
 function topbarHtml(){
   const unread=state.notifications.filter(n=>!n.read).length;const avatar=state.profile?publicAvatar(state.profile):'';
-  return `<header class="topbar"><button class="brand" data-page="home" aria-label="ZC2 Community Arena home"><span class="brand-mark"><img src="./community-arena-emblem.png?v=4" alt=""></span><span class="brand-copy"><span class="brand-title"><strong>ZC2</strong></span><span class="brand-rule"></span><small>COMMUNITY ARENA</small></span></button><div class="top-actions"><button class="top-game-link" data-page="arcade">${icon('sports_esports')}<span>PLAY</span></button>${state.session?`<button class="icon-btn" id="bellBtn" title="Notifications" style="position:relative">${icon('notifications')}${unread?`<span class="badge">${unread>9?'9+':unread}</span>`:''}</button><button class="user-chip" data-page="profile">${avatar?`<img src="${avatar}" alt="">`:`<span class="avatar">${esc((state.profile?.gamertag||'ZC').slice(0,2).toUpperCase())}</span>`}<span>${esc(state.profile?.gamertag||'Profile')}</span></button>`:`<button class="btn primary top-signin" id="signInBtn">${icon('login')}<span>Sign in</span></button>`}<button class="icon-btn menu-trigger" id="moreMenuBtn" title="Menu">${icon('menu')}</button></div></header>`;
+  return `<header class="topbar"><button class="brand" data-page="home" aria-label="ZC2 Community Arena home"><span class="brand-mark"><img src="./zc2-arena-logo.png" alt=""></span><span class="brand-copy"><span class="brand-title"><strong>ZC2</strong></span><span class="brand-rule"></span><small>COMMUNITY ARENA</small></span></button><div class="top-actions"><button class="top-game-link" data-page="arcade">${icon('sports_esports')}<span>PLAY</span></button>${state.session?`<button class="icon-btn" id="bellBtn" title="Notifications" style="position:relative">${icon('notifications')}${unread?`<span class="badge">${unread>9?'9+':unread}</span>`:''}</button><button class="user-chip" data-page="profile">${avatar?`<img src="${avatar}" alt="">`:`<span class="avatar">${esc((state.profile?.gamertag||'ZC').slice(0,2).toUpperCase())}</span>`}<span>${esc(state.profile?.gamertag||'Profile')}</span></button>`:`<button class="btn primary top-signin" id="signInBtn">${icon('login')}<span>Sign in</span></button>`}<button class="icon-btn menu-trigger" id="moreMenuBtn" title="Menu">${icon('menu')}</button></div></header>`;
 }
 
 
@@ -351,13 +298,7 @@ function empty(msg){return `<div class="empty"><div>${icon('radar')}<div>${esc(m
 
 function homeHtml(){
   const f=state.tournaments.find(t=>t.featured)||foundersFallback();const totalPlayers=state.profiles.length;const active=state.tournaments.filter(t=>t.status!=='completed').length;
-  const bulletinSlides=[
-    {id:'tournament',title:'AMBUSH OPEN: First Tournament',subtitle:'Entry is open. Battle the competition in the inaugural ZC2 Community Arena tournament.',cta:'Join now',ctaAction:'data-page="tournaments"',icon:'military_tech',bg:'linear-gradient(135deg,#5f4a1a 0%,#1a2009 100%)'},
-    {id:'game',title:'ZOMBIE SMASH',subtitle:'The main game. Survive hordes, defeat six bosses, and chase the global leaderboard.',cta:'Play',ctaAction:'data-page="arcade"',icon:'sports_esports',bg:'linear-gradient(135deg,#2a1a0a 0%,#0a1815 100%)'},
-    {id:'share',title:'HELP COMMUNITY GROW',subtitle:'Share Community Arena with friends. Bigger community = more tournaments and events.',cta:'Invite friends',ctaAction:'id="bulletinInviteBtn"',icon:'share',bg:'linear-gradient(135deg,#3a1f2a 0%,#1a1f2a 100%)'},
-    {id:'skins',title:'GUN SKINS',subtitle:'Customize your arsenal. Unlock exclusive weapon designs and stand out in the arena.',cta:'View skins',ctaAction:'data-page="arcade"',icon:'palette',bg:'linear-gradient(135deg,#2a3a1a 0%,#1a2009 100%)'}
-  ];
-  return `<div class="home-stack home-game-first"><section class="bulletin-carousel" id="bulletinCarousel" style="background:${bulletinSlides[0].bg}"><div class="bulletin-track" id="bulletinTrack">${bulletinSlides.map((s,i)=>`<article class="bulletin-slide" data-slide="${s.id}" style="background:${s.bg}"><div class="bulletin-content"><span class="kicker">${s.id==='tournament'?'FIRST TOURNAMENT':'FEATURED'}</span><h2>${s.title}</h2><p>${s.subtitle}</p><button class="btn primary big" ${s.ctaAction}>${icon(s.icon)}${s.cta}</button></div></article>`).join('')}</div><div class="bulletin-dots">${bulletinSlides.map((s,i)=>`<button class="bulletin-dot ${i===0?'active':''}" data-slide="${i}" title="${s.title}"></button>`).join('')}</div></section><section class="home-community-row"><article class="home-community-card"><span class="kicker">TOURNAMENTS</span><h2>${esc(f.title||'Community tournaments')}</h2><p>${esc(f.subtitle||'Compete with the community.')}</p><button class="btn secondary" data-page="tournaments">${icon('emoji_events')}Open tournaments</button></article><article class="home-community-card"><span class="kicker">COMMUNITY</span><h2>${totalPlayers} players</h2><p>${active} open or active events. Profiles, chat, groups and competition tools remain available around the game.</p><button class="btn secondary" data-page="community">${icon('groups')}Open community</button></article></section><div class="legal-note">Unofficial community application. Zero Caliber 2 and related game trademarks belong to their respective rights holders.</div></div>`;
+  return `<div class="home-stack home-game-first"><section class="home-zombie-hero"><img src="./zc2-zombie-smash-promo.png" alt="ZC2 Arena Zombie Smash"><div class="home-zombie-copy"><span class="live-pill"><i></i>ZC2 ARENA</span><h1>ZOMBIE<br><em>SMASH</em></h1><p>The Community Arena's main game. Survive the horde, fight six named bosses and chase the global leaderboard in vertical or horizontal play.</p><button class="btn primary big home-play" data-page="arcade">${icon('sports_esports')}PLAY ZOMBIE SMASH</button><div class="home-game-stats"><span><b>6</b><small>BOSSES</small></span><span><b>2</b><small>ORIENTATIONS</small></span><span><b>∞</b><small>FINAL WAVE</small></span></div></div></section><section class="home-community-row"><article class="home-community-card"><span class="kicker">TOURNAMENTS</span><h2>${esc(f.title||'Community tournaments')}</h2><p>${esc(f.subtitle||'Compete with the community.')}</p><button class="btn secondary" data-page="tournaments">${icon('emoji_events')}Open tournaments</button></article><article class="home-community-card"><span class="kicker">COMMUNITY</span><h2>${totalPlayers} players</h2><p>${active} open or active events. Profiles, chat, groups and competition tools remain available around the game.</p><button class="btn secondary" data-page="community">${icon('groups')}Open community</button></article></section><div class="legal-note">Unofficial community application. Zero Caliber 2 and related game trademarks belong to their respective rights holders.</div></div>`;
 }
 
 
@@ -420,7 +361,7 @@ function galleryHtml(){
 function profileHtml(){
   if(!state.session)return `<section>${sectionTitle('IDENTITY','My profile','One simple account for your player identity, tournament history and messages.')}${empty('Sign in or create an account to build your player identity.')}<div style="margin-top:12px"><button class="btn primary" id="signInInline">Sign in / create account</button></div></section>`;
   const p=state.profile||{};const av=state.avatarDraftUrl||publicAvatar(p);const s=statById(state.session.user.id)||{};
-  return `<section>${sectionTitle('IDENTITY','My player profile','Upload a normal profile photo or turn it into an on-device cel-shaded Anime Power portrait before saving.')}<div class="profile-editor premium-profile"><div class="profile-photo avatar-workbench">${av?`<img id="avatarPreviewImg" src="${av}" alt="Profile preview">`:`<span id="avatarPreviewFallback" class="avatar-fallback">${esc((p.gamertag||'ZC').slice(0,2).toUpperCase())}</span>`}<label class="btn secondary file-btn">${icon('photo_camera')}Choose photo<input id="avatarFile" type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif"></label><div class="avatar-actions"><button class="btn primary" id="saveAvatarBtn" ${state.avatarDraftFile?'':'disabled'}>${icon('person')}Use photo</button><button class="btn power" id="animeAvatarBtn" ${state.avatarDraftFile?'':'disabled'}>${icon('auto_awesome')}Anime Power</button></div><small>Anime Power is an instant on-device cel-shading effect. Your original photo is not uploaded until you choose a result.</small></div><div><div class="form-grid"><div class="field"><label>Gamer tag</label><input id="profileGamertag" value="${esc(p.gamertag||'')}"></div><div class="field"><label>Platform</label><select id="profilePlatform">${['Quest','PCVR','Both'].map(v=>`<option ${p.platform===v?'selected':''}>${v}</option>`).join('')}</select></div><div class="field"><label>Region</label><input id="profileRegion" value="${esc(p.region||'')}"></div><div class="field wide"><label>Bio</label><textarea id="profileBio" placeholder="Play style, preferred modes, availability…">${esc(p.bio||'')}</textarea></div></div><button class="btn primary" id="saveProfileBtn">${icon('save')}Save profile</button></div></div><div class="profile-summary"><div><b>${Number(s.adjusted_kills||0).toFixed(1)}</b><span>League kills</span></div><div><b>${s.matches||0}</b><span>Matches</span></div><div><b>${s.qualifiers||0}</b><span>Qualifications</span></div><div><b>${s.wins||0}</b><span>Wins</span></div></div></section>`;
+  return `<section>${sectionTitle('IDENTITY','My player profile','Choose a character from Zombie Smash or upload your own photo.')}<div class="profile-editor premium-profile"><div class="profile-photo avatar-workbench">${av?`<img id="avatarPreviewImg" src="${av}" alt="Profile preview">`:`<span id="avatarPreviewFallback" class="avatar-fallback">${esc((p.gamertag||'ZC').slice(0,2).toUpperCase())}</span>`}<label class="btn secondary file-btn">${icon('photo_camera')}Choose photo<input id="avatarFile" type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif"></label><div class="avatar-actions"><button class="btn primary" id="saveAvatarBtn" ${state.avatarDraftFile?'':'disabled'}>${icon('person')}Use photo</button><button class="btn secondary" id="characterAvatarBtn">${icon('grid_view')}Character gallery</button></div><small>Choose Joey Rob, any boss stage or a zombie. Your selection becomes your profile picture across the app.</small></div><div><div class="form-grid"><div class="field"><label>Gamer tag</label><input id="profileGamertag" value="${esc(p.gamertag||'')}"></div><div class="field"><label>Platform</label><select id="profilePlatform">${['Quest','PCVR','Both'].map(v=>`<option ${p.platform===v?'selected':''}>${v}</option>`).join('')}</select></div><div class="field"><label>Region</label><input id="profileRegion" value="${esc(p.region||'')}"></div><div class="field wide"><label>Bio</label><textarea id="profileBio" placeholder="Play style, preferred modes, availability…">${esc(p.bio||'')}</textarea></div></div><button class="btn primary" id="saveProfileBtn">${icon('save')}Save profile</button></div></div><div class="profile-summary"><div><b>${Number(s.adjusted_kills||0).toFixed(1)}</b><span>League kills</span></div><div><b>${s.matches||0}</b><span>Matches</span></div><div><b>${s.qualifiers||0}</b><span>Qualifications</span></div><div><b>${s.wins||0}</b><span>Wins</span></div></div></section>`;
 }
 
 function adminHtml(){
@@ -444,12 +385,12 @@ function drawerHtml(){
 
 function modalHtml(){
   if(!state.modal)return '';if(state.modal.type==='notifications')return '';
-  if(state.modal.type==='menu')return menuModalHtml();if(state.modal.type==='newDm')return newDmModalHtml();if(state.modal.type==='groupCallSetup')return groupCallSetupModalHtml();if(state.modal.type==='auth')return authModalHtml();if(state.modal.type==='gamertag')return gamertagModalHtml();if(state.modal.type==='profilePicture')return profilePictureSelectorHtml();if(state.modal.type==='invite')return inviteModalHtml();if(state.modal.type==='player')return playerModalHtml();if(state.modal.type==='tournament')return tournamentModalHtml();if(state.modal.type==='result')return resultModalHtml();if(state.modal.type==='report')return reportModalHtml();if(state.modal.type==='proof')return proofModalHtml();return '';
+  if(state.modal.type==='menu')return menuModalHtml();if(state.modal.type==='newDm')return newDmModalHtml();if(state.modal.type==='groupCallSetup')return groupCallSetupModalHtml();if(state.modal.type==='auth')return authModalHtml();if(state.modal.type==='invite')return inviteModalHtml();if(state.modal.type==='player')return playerModalHtml();if(state.modal.type==='tournament')return tournamentModalHtml();if(state.modal.type==='result')return resultModalHtml();if(state.modal.type==='report')return reportModalHtml();if(state.modal.type==='proof')return proofModalHtml();return '';
 }
 
 function modalWrap(body,narrow=false){return `<div class="modal-wrap" id="modalWrap"><div class="modal ${narrow?'narrow':''}"><div class="modal-body">${body}</div></div></div>`;}
 
-function menuModalHtml(){return modalWrap(`<div class="modal-head"><div><span class="kicker">ARENA MENU</span><h2>Community Arena</h2></div><button class="icon-btn" data-close-modal>${icon('close')}</button></div><div class="premium-menu"><button data-menu-page="community">${icon('groups')}<span><b>Community</b><small>Players and profiles</small></span></button><button data-menu-page="gallery">${icon('photo_library')}<span><b>Gallery</b><small>Artwork and screenshots</small></span></button>${state.session?`<button data-menu-page="admin">${icon('shield')}<span><b>${state.admin?'Administration':'Admin access'}</b><small>${state.admin?'Results, reports and events':'Enter the admin code for this app session'}</small></span></button>`:''}<button id="menuInvite">${icon('person_add')}<span><b>Invite a player</b><small>Share Community Arena</small></span></button><button id="replayIntroBtn">${icon('movie')}<span><b>Replay intro</b><small>Community Arena opening</small></span></button><button id="menuSupportBtn">${icon('favorite')}<span><b>Support developer</b><small>Buy me a coffee</small></span></button>${state.session?`<button id="menuSignOut">${icon('logout')}<span><b>Sign out</b><small>${esc(state.profile?.gamertag||'Current account')}</small></span></button>`:''}</div><div class="menu-brand"><img src="./jw-eds-yellow.png?v=4" alt="JW EDS"><span>Build ${BUILD}</span></div>`,true);}
+function menuModalHtml(){return modalWrap(`<div class="modal-head"><div><span class="kicker">ARENA MENU</span><h2>Community Arena</h2></div><button class="icon-btn" data-close-modal>${icon('close')}</button></div><div class="premium-menu"><button data-menu-page="community">${icon('groups')}<span><b>Community</b><small>Players and profiles</small></span></button><button data-menu-page="gallery">${icon('photo_library')}<span><b>Gallery</b><small>Artwork and screenshots</small></span></button>${state.session?`<button data-menu-page="admin">${icon('shield')}<span><b>${state.admin?'Administration':'Admin access'}</b><small>${state.admin?'Results, reports and events':'Enter the admin code for this app session'}</small></span></button>`:''}<button id="menuInvite">${icon('person_add')}<span><b>Invite a player</b><small>Share Community Arena</small></span></button><button id="replayIntroBtn">${icon('movie')}<span><b>Replay intro</b><small>Community Arena opening</small></span></button>${state.session?`<button id="menuSignOut">${icon('logout')}<span><b>Sign out</b><small>${esc(state.profile?.gamertag||'Current account')}</small></span></button>`:''}</div><div class="menu-brand"><img src="./jw-eds-yellow.png?v=4" alt="JW EDS"><span>Build ${BUILD}</span></div>`,true);}
 function newDmModalHtml(){const players=state.profiles.filter(p=>p.id!==state.session?.user.id);return modalWrap(`<div class="modal-head"><div><span class="kicker">PRIVATE CHAT</span><h2>Start a conversation</h2><p>Select a Community Arena player.</p></div><button class="icon-btn" data-close-modal>${icon('close')}</button></div><div class="field"><label>Player</label><select id="newDmPlayer"><option value="">Choose player…</option>${players.map(p=>`<option value="${p.id}">${esc(p.gamertag)}</option>`).join('')}</select></div><br><button class="btn primary big" id="startDmBtn">${icon('chat')}Open private chat</button>`,true);}
 function groupCallSetupModalHtml(){
   const players=state.profiles.filter(p=>p.id!==state.session?.user.id);const pre=state.modal.preselect||'';
@@ -464,22 +405,11 @@ function authFormFields(){
   const saved=esc(localStorage.getItem(REMEMBER_EMAIL_KEY)||'');
   return `${socialHtml}<div class="auth-tabs"><button class="btn primary" id="authSignInTab" type="button">Sign in</button><button class="btn secondary" id="authSignUpTab" type="button">Create account</button></div><form id="authForm" autocomplete="on"><div class="form-grid"><div class="field wide"><label>Email</label><input id="authEmail" name="username" type="email" autocomplete="username" inputmode="email" value="${saved}" placeholder="you@example.com" autocapitalize="none" spellcheck="false"></div><div class="field wide"><label>Password</label><input id="authPassword" name="password" type="password" autocomplete="current-password" minlength="8" placeholder="Password"></div><label class="remember-login wide"><input id="rememberEmail" type="checkbox" ${saved?'checked':''}><span><b>Remember my email</b><small>Password is handled by your device password manager, not stored by this app.</small></span></label><div id="signupExtras" class="signup-extras hidden"><div class="field"><label>Gamer tag</label><input id="authGamertag" maxlength="24" autocomplete="nickname" placeholder="Your ZC2 name"></div><div class="field"><label>Platform</label><select id="authPlatform"><option>Quest</option><option>PCVR</option><option>Both</option></select></div></div></div><div class="auth-action-row"><button class="btn primary big" id="authSubmit" type="submit">Sign in</button><button class="btn ghost" id="forgotPasswordBtn" type="button">Forgot password</button></div></form><p class="auth-note">Sessions persist automatically while valid, so normal use should not require repeated sign-in.</p>`;
 }
-function gamertagModalHtml(){
-  const p=state.profile||{};
-  return modalWrap(`<div class="modal-head"><div><span class="kicker">IDENTITY</span><h2>Create your gamer tag</h2><p>Choose a username to represent you in tournaments and community leaderboards. You can change this later in your profile.</p></div><button class="icon-btn" data-close-modal>${icon('close')}</button></div><div class="profile-setup-form"><div class="field"><label>Gamer tag</label><input id="setupGamertag" placeholder="Your player name" value="${esc(p.gamertag||'')}"></div><div class="field"><label>Platform</label><select id="setupPlatform">${['Quest','PCVR','Both'].map(v=>`<option ${p.platform===v?'selected':''}>${v}</option>`).join('')}</select></div><button class="btn primary big" id="confirmGamertagBtn">${icon('check')}Continue</button></div>`,true);
-}
-
-function profilePictureSelectorHtml(){
-  const all=[...profilePictures.bosses,...profilePictures.zombies];
-  const current=state.profile?.profile_picture||'';
-  return modalWrap(`<div class="modal-head"><div><span class="kicker">PROFILE</span><h2>Choose your profile picture</h2><p>Select from the ZC2 character library or upload your own. You can change this anytime.</p></div><button class="icon-btn" data-close-modal>${icon('close')}</button></div><div class="profile-selector-wrap"><div class="picture-gallery">${all.map(p=>`<label class="picture-card" data-picture="${p.file}"><input type="radio" name="profilePicture" value="${p.file}" ${current===p.file?'checked':''}><img src="${profilePictureUrl(p.file)}" alt="${esc(p.name)}"><span>${esc(p.name)}</span></label>`).join('')}</div><div class="picture-upload"><label class="btn secondary file-btn">${icon('photo_camera')}Upload custom photo<input id="customProfilePicFile" type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif"></label></div><button class="btn primary big" id="confirmProfilePicBtn">${icon('check')}Continue</button></div>`,true);
-}
-
 function authModalHtml(){
   return modalWrap(`<div class="modal-head"><div><span class="kicker">ACCOUNT</span><h2>Community Arena account</h2><p>Sign in once and the installed app keeps your session active. Your device password manager can securely autofill your password.</p></div><button class="icon-btn" data-close-modal>${icon('close')}</button></div>${authFormFields()}`,true);
 }
 function authGateHtml(){
-  return `<div class="auth-gate"><div class="home-zombie-hero auth-gate-hero"><img src="./zc2-zombie-smash-promo.png?v=4" alt="ZC2 Arena Zombie Smash"><div class="home-zombie-copy"><span class="live-pill"><i></i>ZC2 ARENA</span><h1>ZOMBIE<br><em>SMASH</em></h1><p>Survive the horde, fight six named bosses and chase the global leaderboard in vertical or horizontal play. Sign in below to unlock Community Arena and start playing.</p><div class="home-game-stats"><span><b>6</b><small>BOSSES</small></span><span><b>2</b><small>ORIENTATIONS</small></span><span><b>∞</b><small>FINAL WAVE</small></span></div></div></div><div class="auth-gate-formwrap"><div class="modal narrow auth-gate-modal"><div class="modal-body"><div class="auth-gate-brand"><img src="./community-arena-emblem.png?v=4" alt=""><span class="brand-copy"><span class="brand-title"><strong>ZC2</strong></span><span class="brand-rule"></span><small>COMMUNITY ARENA</small></span></div><div class="modal-head"><div><span class="kicker">ACCOUNT</span><h2>Sign in to continue</h2><p>Create a free account or sign in to explore Community Arena and play Zombie Smash.</p></div></div>${authFormFields()}</div></div></div></div>`;
+  return `<div class="auth-gate"><div class="home-zombie-hero auth-gate-hero"><img src="./zc2-zombie-smash-promo.png?v=4" alt="ZC2 Arena Zombie Smash"><div class="home-zombie-copy"><span class="live-pill"><i></i>ZC2 ARENA</span><h1>ZOMBIE<br><em>SMASH</em></h1><p>Sign in to save your identity and compete on the global leaderboard. Your game is ready whenever you are.</p><div class="home-game-stats"><span><b>6</b><small>BOSSES</small></span><span><b>2</b><small>ORIENTATIONS</small></span><span><b>∞</b><small>FINAL WAVE</small></span></div></div></div><button class="btn primary" id="guestPlayBtn">Back to Zombie Smash</button><div class="auth-gate-formwrap"><div class="modal narrow auth-gate-modal"><div class="modal-body"><div class="auth-gate-brand"><img src="./zc2-arena-logo.png" alt=""><span class="brand-copy"><span class="brand-title"><strong>ZC2</strong></span><span class="brand-rule"></span><small>COMMUNITY ARENA</small></span></div><div class="modal-head"><div><span class="kicker">ACCOUNT</span><h2>Sign in to continue</h2><p>Create a free account or sign in to explore Community Arena and play Zombie Smash.</p></div></div>${authFormFields()}</div></div></div></div>`;
 }
 
 function inviteModalHtml(){const link=state.modal.link||baseUrl();return modalWrap(`<div class="modal-head"><div><span class="kicker">INVITE</span><h2>${state.modal.title||'Join the community'}</h2><p>Share this link by email, text, copy/paste or the device share sheet used by Quest and other apps.</p></div><button class="icon-btn" data-close-modal>${icon('close')}</button></div><div class="invite-actions"><button id="inviteEmail">${icon('mail')}Email</button><button id="inviteSms">${icon('sms')}Phone / SMS</button><button id="inviteCopy">${icon('content_copy')}Copy link</button><button id="inviteNative">${icon('share')}Quest / apps</button></div><div class="invite-link">${esc(link)}</div><img class="invite-artwork" src="./community-arena-join.webp?v=4" alt="Join ZC2 Community Arena">`,true);}
@@ -600,21 +530,10 @@ function bindCommon(){
 }
 
 function bindPage(){
-  if(state.page==='home')bindBulletin();if(state.page==='tournaments')bindTournaments();if(state.page==='arcade')window.ZC2Arcade?.bindPage?.();if(state.page==='community')bindCommunity();if(state.page==='chat')bindChat();if(state.page==='gallery')bindGallery();if(state.page==='profile')bindProfile();if(state.page==='admin')bindAdmin();
+  if(state.page==='tournaments')bindTournaments();if(state.page==='arcade')window.ZC2Arcade?.bindPage?.();if(state.page==='community')bindCommunity();if(state.page==='chat')bindChat();if(state.page==='gallery')bindGallery();if(state.page==='profile')bindProfile();if(state.page==='admin')bindAdmin();
   bindModal();
 }
 
-function bindBulletin(){
-  const carousel=$('#bulletinCarousel');const track=$('#bulletinTrack');const dots=$$('.bulletin-dot');let current=0;const slides=4;
-  if(!carousel||!track)return;
-  const updateCarousel=(index)=>{current=index%slides;track.style.transform=`translateX(${-current*100}%)`;dots.forEach((d,i)=>d.classList.toggle('active',i===current));};
-  dots.forEach((dot,i)=>dot.addEventListener('click',()=>updateCarousel(i)));
-  $('#bulletinInviteBtn')?.addEventListener('click',()=>openInvite(baseUrl(),'Join ZC2 Community Arena'));
-  let autoPlayTimer;const resetAutoPlay=()=>{clearInterval(autoPlayTimer);autoPlayTimer=setInterval(()=>updateCarousel(current+1),6000);};
-  resetAutoPlay();
-  let touchStart=0;track.addEventListener('touchstart',e=>{touchStart=e.touches[0].clientX;clearInterval(autoPlayTimer);},{passive:true});
-  track.addEventListener('touchend',e=>{const diff=touchStart-e.changedTouches[0].clientX;if(Math.abs(diff)>50)updateCarousel(diff>0?current+1:current-1);resetAutoPlay();},{passive:true});
-}
 function bindTournaments(){ $('#createPrivateBtn')?.addEventListener('click',createPrivateTournament); }
 function bindCommunity(){ $('#communitySearch')?.addEventListener('input',e=>{state.communitySearch=e.target.value;render();setTimeout(()=>$('#communitySearch')?.focus(),0);});$('#inviteCommunityBtn')?.addEventListener('click',()=>openInvite(baseUrl(),'Join ZC2 Community Arena')); }
 function bindChat(){
@@ -624,49 +543,25 @@ function bindChat(){
 
 function bindGallery(){ let chosen=null;$('#galleryFile')?.addEventListener('change',e=>{chosen=e.target.files?.[0]||null;$('#publishGalleryBtn').disabled=!chosen;});$('#publishGalleryBtn')?.addEventListener('click',()=>publishGallery(chosen)); }
 function bindProfile(){
-  $('#avatarFile')?.addEventListener('change',e=>{const f=e.target.files?.[0];if(f)handleAvatarSelection(f);});$('#saveAvatarBtn')?.addEventListener('click',()=>state.avatarDraftFile&&uploadAvatar(state.avatarDraftFile));$('#animeAvatarBtn')?.addEventListener('click',()=>state.avatarDraftFile&&createAnimePowerAvatar(state.avatarDraftFile));$('#saveProfileBtn')?.addEventListener('click',saveProfile);
+  $('#avatarFile')?.addEventListener('change',e=>{const f=e.target.files?.[0];if(f)handleAvatarSelection(f);});$('#saveAvatarBtn')?.addEventListener('click',()=>state.avatarDraftFile&&uploadAvatar(state.avatarDraftFile));$('#characterAvatarBtn')?.addEventListener('click',()=>window.ZSCharacters.open({selected:state.profile?.profile_picture,onSelect:selectCharacterAvatar}));$('#saveProfileBtn')?.addEventListener('click',saveProfile);
 }
 
 function bindAdmin(){ $('#activateAdminBtn')?.addEventListener('click',activateAdmin);$('#createPublicBtn')?.addEventListener('click',createPublicTournament);$$('[data-approve-submission]').forEach(b=>b.onclick=()=>approveSubmission(b.dataset.approveSubmission));$$('[data-resolve-report]').forEach(b=>b.onclick=()=>resolveReport(b.dataset.resolveReport,b.dataset.decision));$$('[data-proof]').forEach(b=>b.onclick=()=>openProof(b.dataset.proof)); }
 function bindModal(){
   if(!state.modal)return;
-  if(state.modal.type==='menu'){$$('[data-menu-page]').forEach(b=>b.onclick=()=>{state.page=b.dataset.menuPage;state.modal=null;if(state.page==='admin')loadAdminData();render();});$('#menuInvite')?.addEventListener('click',()=>openInvite(baseUrl(),'Join ZC2 Community Arena'));$('#replayIntroBtn')?.addEventListener('click',replayIntro);$('#menuSupportBtn')?.addEventListener('click',()=>window.open('https://buymeacoffee.com/joeyrob','_blank'));$('#menuSignOut')?.addEventListener('click',async()=>{state.modal=null;if(state.call.status!=='idle')hangupCall();if(state.groupCall.status!=='idle')leaveGroupCall();await leaveVoice();await supabase.auth.signOut();setToast('Signed out.');});}
+  if(state.modal.type==='menu'){$$('[data-menu-page]').forEach(b=>b.onclick=()=>{state.page=b.dataset.menuPage;state.modal=null;if(state.page==='admin')loadAdminData();render();});$('#menuInvite')?.addEventListener('click',()=>openInvite(baseUrl(),'Join ZC2 Community Arena'));$('#replayIntroBtn')?.addEventListener('click',replayIntro);$('#menuSignOut')?.addEventListener('click',async()=>{state.modal=null;if(state.call.status!=='idle')hangupCall();if(state.groupCall.status!=='idle')leaveGroupCall();await leaveVoice();await supabase.auth.signOut();setToast('Signed out.');});}
   if(state.modal.type==='newDm')$('#startDmBtn')?.addEventListener('click',async()=>{const id=$('#newDmPlayer').value;if(!id)return setToast('Choose a player.');state.modal=null;state.page='chat';await openDm(id);});
   if(state.modal.type==='groupCallSetup'){
     const updateCount=()=>{const checked=$$('.group-call-check:checked');if(checked.length>5){checked.at(-1).checked=false;setToast('Group calls support up to 6 people including you.');}const n=$$('.group-call-check:checked').length;const c=$('#groupCallCount');if(c)c.textContent=n+' selected';};
     $$('.group-call-check').forEach(c=>c.addEventListener('change',updateCount));
     $('#startGroupCallBtn')?.addEventListener('click',startGroupCallFromModal);
   }
-  if(state.modal.type==='auth')bindAuthModal();if(state.modal.type==='gamertag')bindGamertagModal();if(state.modal.type==='profilePicture')bindProfilePictureModal();if(state.modal.type==='invite')bindInviteModal();if(state.modal.type==='player'){$('[data-dm-from-profile]')?.addEventListener('click',e=>{const id=e.currentTarget.dataset.dmFromProfile;state.modal=null;state.page='chat';openDm(id);});$('[data-call-player]')?.addEventListener('click',e=>startDirectCall(e.currentTarget.dataset.callPlayer,e.currentTarget.dataset.callName));}
+  if(state.modal.type==='auth')bindAuthModal();if(state.modal.type==='invite')bindInviteModal();if(state.modal.type==='player'){$('[data-dm-from-profile]')?.addEventListener('click',e=>{const id=e.currentTarget.dataset.dmFromProfile;state.modal=null;state.page='chat';openDm(id);});$('[data-call-player]')?.addEventListener('click',e=>startDirectCall(e.currentTarget.dataset.callPlayer,e.currentTarget.dataset.callName));}
   if(state.modal.type==='tournament'){$('#submitResultBtn')?.addEventListener('click',()=>{if(state.portal)state.modal={type:'result',match:{...state.portal,players:state.portal.players||[]}};render();});$$('[data-report-player]').forEach(b=>b.onclick=()=>{state.modal={type:'report',target:{id:b.dataset.reportPlayer,gamertag:b.dataset.reportName},matchId:state.portal.match_id};render();});}
   if(state.modal.type==='result')bindResultModal();if(state.modal.type==='report')$('#submitReportBtn')?.addEventListener('click',submitReport);
 }
 
 function openAuth(){state.modal={type:'auth',mode:'signin'};render();}
-function bindGamertagModal(){
-  const input=$('#setupGamertag');input?.focus();
-  $('#confirmGamertagBtn')?.addEventListener('click',async()=>{
-    const gamertag=input?.value.trim()||'';const platform=$('#setupPlatform').value||'Quest';
-    if(gamertag.length<2)return setToast('Gamer tag must be at least 2 characters.');
-    const {error}=await supabase.from('profiles').update({gamertag,platform,updated_at:new Date().toISOString()}).eq('id',state.session.user.id);
-    if(error)return setToast(error.message);
-    state.modal={type:'profilePicture'};render();
-  });
-}
-
-function bindProfilePictureModal(){
-  const fileInput=$('#customProfilePicFile');
-  fileInput?.addEventListener('change',e=>{const f=e.target.files?.[0];if(f)handleCustomProfilePic(f);});
-  $$('.picture-card').forEach(card=>{card.addEventListener('click',()=>{const input=card.querySelector('input[type="radio"]');if(input)input.checked=true;});});
-  $('#confirmProfilePicBtn')?.addEventListener('click',async()=>{
-    const selected=$('input[name="profilePicture"]:checked')?.value;
-    if(!selected)return setToast('Choose a profile picture.');
-    const {error}=await supabase.from('profiles').update({profile_picture:selected,updated_at:new Date().toISOString()}).eq('id',state.session.user.id);
-    if(error)return setToast(error.message);
-    state.modal=null;setToast('Profile picture saved.');await refreshAll();render();
-  });
-}
-
 function bindAuthModal(){
   const extras=$('#signupExtras');const forgot=$('#forgotPasswordBtn');const password=$('#authPassword');const setMode=mode=>{state.modal.mode=mode;$('#authSignInTab').className='btn '+(mode==='signin'?'primary':'secondary');$('#authSignUpTab').className='btn '+(mode==='signup'?'primary':'secondary');$('#authSubmit').textContent=mode==='signup'?'Create my account':'Sign in';extras?.classList.toggle('hidden',mode!=='signup');if(password)password.autocomplete=mode==='signup'?'new-password':'current-password';if(forgot)forgot.style.display=mode==='signup'?'none':'';};
   if(state.modal.mode==='recovery'){$('#authSignInTab').style.display='none';$('#authSignUpTab').style.display='none';$('#authEmail').closest('.field').style.display='none';$('#rememberEmail')?.closest('.remember-login')?.classList.add('hidden');extras?.classList.add('hidden');$('#authSubmit').textContent='Set new password';$('#authPassword').placeholder='Enter a new password';if(password)password.autocomplete='new-password';if(forgot)forgot.style.display='none';}else setMode(state.modal.mode||'signin');
@@ -914,8 +809,6 @@ async function handleVoiceSignal(payload){
 function startCallTimer(){clearInterval(updateCallTimer.interval);updateCallTimer();updateCallTimer.interval=setInterval(updateCallTimer,1000);}
 function updateCallTimer(){const el=$('#callTimer');const started=state.call.startedAt||state.groupCall.startedAt;if(!el||!started)return;const total=Math.max(0,Math.floor((Date.now()-started)/1000)),m=Math.floor(total/60),s=total%60;el.textContent=`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;}
 
-async function handleCustomProfilePic(file){if(!file||!state.session)return;try{const blob=await resizeImage(file,400,.88);const path=`${state.session.user.id}/profile-pic-${Date.now()}.jpg`;const up=await supabase.storage.from('avatars').upload(path,blob,{contentType:'image/jpeg',upsert:false});if(up.error)throw up.error;const {error}=await supabase.from('profiles').update({profile_picture_custom:path,updated_at:new Date().toISOString()}).eq('id',state.session.user.id);if(error)throw error;setToast('Custom profile picture saved.');await refreshAll();render();}catch(e){setToast(e.message||'Custom profile picture upload failed.');}}
-
 async function uploadAvatar(file){if(!state.session||!file)return;try{const blob=await resizeImage(file,1000,.88);await saveAvatarBlob(blob,'photo');}catch(e){setToast(e.message||'Profile picture upload failed.');}}
 
 async function saveProfile(){const gamertag=$('#profileGamertag').value.trim(),platform=$('#profilePlatform').value,region=$('#profileRegion').value.trim(),bio=$('#profileBio').value.trim();if(gamertag.length<2)return setToast('Gamer tag is too short.');const {error}=await supabase.from('profiles').update({gamertag,platform,region,bio,updated_at:new Date().toISOString()}).eq('id',state.session.user.id);if(error)return setToast(error.message);setToast('Profile saved.');await refreshAll();render();}
@@ -928,21 +821,14 @@ async function resizeImage(file,max=1400,quality=.84){
 
 
 
-function handleAvatarSelection(file){if(state.avatarDraftUrl)URL.revokeObjectURL(state.avatarDraftUrl);state.avatarDraftFile=file;state.avatarDraftUrl=URL.createObjectURL(file);const img=$('#avatarPreviewImg');const fallback=$('#avatarPreviewFallback');if(img)img.src=state.avatarDraftUrl;else if(fallback){const n=document.createElement('img');n.id='avatarPreviewImg';n.src=state.avatarDraftUrl;n.alt='Profile preview';fallback.replaceWith(n);}$('#saveAvatarBtn')?.removeAttribute('disabled');$('#animeAvatarBtn')?.removeAttribute('disabled');setToast('Photo ready. Use it normally or create an Anime Power version.');}
-async function saveAvatarBlob(blob,label='photo'){const uid=state.session.user.id;const path=`${uid}/avatar-${Date.now()}.jpg`;const up=await supabase.storage.from('avatars').upload(path,blob,{contentType:'image/jpeg',upsert:false});if(up.error)throw up.error;let result=await supabase.from('profiles').update({avatar_path:path,updated_at:new Date().toISOString()}).eq('id',uid).select('id').maybeSingle();if(result.error)throw result.error;if(!result.data){const meta=state.session.user.user_metadata||{};const gamertag=(meta.gamertag||state.session.user.email?.split('@')[0]||'Player')+'-'+uid.slice(0,4).toUpperCase();const ins=await supabase.from('profiles').insert({id:uid,gamertag,platform:meta.platform||'Quest',avatar_path:path});if(ins.error)throw ins.error;}if(state.avatarDraftUrl)URL.revokeObjectURL(state.avatarDraftUrl);state.avatarDraftUrl='';state.avatarDraftFile=null;setToast(label==='anime'?'Anime Power portrait saved.':'Profile picture updated.');await refreshAll();render();}
-async function createAnimePowerAvatar(file){try{setToast('Creating Anime Power portrait on this device…');const blob=await animePowerBlob(file);await saveAvatarBlob(blob,'anime');}catch(e){setToast(e.message||'Could not create the portrait.');}}
-async function animePowerBlob(file){
-  const dataUrl=await new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=reject;r.readAsDataURL(file);});const img=await new Promise((resolve,reject)=>{const i=new Image();i.onload=()=>resolve(i);i.onerror=()=>reject(new Error('Use JPEG, PNG or WEBP for Anime Power.'));i.src=dataUrl;});
-  const size=900,c=document.createElement('canvas');c.width=c.height=size;const ctx=c.getContext('2d',{alpha:false});const scale=Math.max(size/img.width,size/img.height),w=img.width*scale,h=img.height*scale,x=(size-w)/2,y=(size-h)/2;ctx.fillStyle='#080a0b';ctx.fillRect(0,0,size,size);ctx.drawImage(img,x,y,w,h);let im=ctx.getImageData(0,0,size,size),d=im.data,lum=new Uint8Array(size*size);
-  for(let i=0,p=0;i<d.length;i+=4,p++){let r=d[i],g=d[i+1],b=d[i+2],avg=(r+g+b)/3;r=avg+(r-avg)*1.42;g=avg+(g-avg)*1.42;b=avg+(b-avg)*1.42;r=(r-128)*1.18+128;g=(g-128)*1.18+128;b=(b-128)*1.18+128;const step=32;r=Math.round(Math.max(0,Math.min(255,r))/step)*step;g=Math.round(Math.max(0,Math.min(255,g))/step)*step;b=Math.round(Math.max(0,Math.min(255,b))/step)*step;d[i]=r;d[i+1]=g;d[i+2]=b;lum[p]=(r*3+g*6+b)/10;}
-  const copy=new Uint8ClampedArray(d);for(let yy=1;yy<size-1;yy++){for(let xx=1;xx<size-1;xx++){const p=yy*size+xx,gx=-lum[p-size-1]-2*lum[p-1]-lum[p+size-1]+lum[p-size+1]+2*lum[p+1]+lum[p+size+1],gy=-lum[p-size-1]-2*lum[p-size]-lum[p-size+1]+lum[p+size-1]+2*lum[p+size]+lum[p+size+1],edge=Math.sqrt(gx*gx+gy*gy),i=p*4;if(edge>92){d[i]=copy[i]*.26;d[i+1]=copy[i+1]*.22;d[i+2]=copy[i+2]*.16;}else if(edge>48){d[i]=copy[i]*.58;d[i+1]=copy[i+1]*.54;d[i+2]=copy[i+2]*.48;}}}
-  ctx.putImageData(im,0,0);const grad=ctx.createRadialGradient(size*.5,size*.42,size*.18,size*.5,size*.5,size*.72);grad.addColorStop(0,'rgba(255,214,50,0)');grad.addColorStop(.72,'rgba(255,177,0,.05)');grad.addColorStop(1,'rgba(0,0,0,.48)');ctx.fillStyle=grad;ctx.fillRect(0,0,size,size);ctx.strokeStyle='rgba(245,215,29,.88)';ctx.lineWidth=10;ctx.strokeRect(5,5,size-10,size-10);return await new Promise((resolve,reject)=>c.toBlob(b=>b?resolve(b):reject(new Error('Portrait conversion failed.')),'image/jpeg',.9));
-}
+function handleAvatarSelection(file){if(state.avatarDraftUrl)URL.revokeObjectURL(state.avatarDraftUrl);state.avatarDraftFile=file;state.avatarDraftUrl=URL.createObjectURL(file);const img=$('#avatarPreviewImg');const fallback=$('#avatarPreviewFallback');if(img)img.src=state.avatarDraftUrl;else if(fallback){const n=document.createElement('img');n.id='avatarPreviewImg';n.src=state.avatarDraftUrl;n.alt='Profile preview';fallback.replaceWith(n);}$('#saveAvatarBtn')?.removeAttribute('disabled');setToast('Photo ready. Choose Use photo to save it.');}
+async function saveAvatarBlob(blob,label='photo'){const uid=state.session.user.id;const path=`${uid}/avatar-${Date.now()}.jpg`;const up=await supabase.storage.from('avatars').upload(path,blob,{contentType:'image/jpeg',upsert:false});if(up.error)throw up.error;let result=await supabase.from('profiles').update({avatar_path:path,profile_picture:null,updated_at:new Date().toISOString()}).eq('id',uid).select('id').maybeSingle();if(result.error)throw result.error;if(!result.data){const meta=state.session.user.user_metadata||{};const gamertag=(meta.gamertag||state.session.user.email?.split('@')[0]||'Player')+'-'+uid.slice(0,4).toUpperCase();const ins=await supabase.from('profiles').insert({id:uid,gamertag,platform:meta.platform||'Quest',avatar_path:path});if(ins.error)throw ins.error;}if(state.avatarDraftUrl)URL.revokeObjectURL(state.avatarDraftUrl);state.avatarDraftUrl='';state.avatarDraftFile=null;setToast('Profile picture updated.');await refreshAll();render();}
+async function selectCharacterAvatar(character){if(!state.session)throw new Error('Sign in to save your profile picture.');const {data,error}=await supabase.from('profiles').update({profile_picture:character.id,updated_at:new Date().toISOString()}).eq('id',state.session.user.id).select('id').maybeSingle();if(error)throw error;if(!data)throw new Error('Your profile could not be updated. Please sign in again.');if(state.avatarDraftUrl)URL.revokeObjectURL(state.avatarDraftUrl);state.avatarDraftUrl='';state.avatarDraftFile=null;state.profile={...state.profile,profile_picture:character.id};localStorage.setItem('zs6-character',character.id);setToast('Profile picture updated.');render();}
 async function publishGallery(file){if(!file||!state.session)return;try{const blob=await resizeImage(file,1600,.84);const path=`${state.session.user.id}/gallery-${Date.now()}.jpg`;const up=await supabase.storage.from('gallery-public').upload(path,blob,{contentType:'image/jpeg'});if(up.error)throw up.error;const cap=$('#galleryCaption').value.trim();const ins=await supabase.from('gallery_items').insert({user_id:state.session.user.id,image_path:path,caption:cap});if(ins.error)throw ins.error;setToast('Artwork published.');await refreshAll();render();}catch(e){setToast(e.message||'Gallery upload failed.');}}
 
 async function bindResultModal(){
   let screenshotFile=null,screenshotPath='',ocrText='';
-  $('#resultScreenshot').onchange=async e=>{screenshotFile=e.target.files?.[0]||null;if(!screenshotFile)return;$('#ocrStatus').textContent='Preparing screenshot…';const blob=await resizeImage(screenshotFile,1600,.86);screenshotFile=blob;try{const path=`${state.session.user.id}/${state.selectedTournament.id}/${state.portal.match_id}/${Date.now()}.jpg`;const up=await supabase.storage.from('result-screenshots').upload(path,blob,{contentType:'image/jpeg'});if(up.error)throw up.error;screenshotPath=path;$('#ocrStatus').textContent='Reading scoreboard…';if(window.Tesseract){const res=await window.Tesseract.recognize(blob,'eng',{logger:m=>{if(m.status==='recognizing text'){state.ocrProgress=Math.round((m.progress||0)*100);const bar=$('#ocrProgress');if(bar)bar.style.width=state.ocrProgress+'%';}}});ocrText=res.data.text||'';autoFillScores(ocrText,state.portal.players||[]);$('#ocrStatus').textContent='Screenshot read. Check every score before submitting.';}else{$('#ocrStatus').textContent='Screenshot uploaded. Automatic reading is unavailable; enter scores manually.';}}catch(err){$('#ocrStatus').textContent='Screenshot reading failed. Enter scores manually.';setToast(err.message||'Screenshot processing failed.');}};
+  $('#resultScreenshot').onchange=async e=>{screenshotFile=e.target.files?.[0]||null;if(!screenshotFile)return;$('#ocrStatus').textContent='Preparing screenshot…';const blob=await resizeImage(screenshotFile,1600,.86);screenshotFile=blob;try{const path=`${state.session.user.id}/${state.selectedTournament.id}/${state.portal.match_id}/${Date.now()}.jpg`;const up=await supabase.storage.from('result-screenshots').upload(path,blob,{contentType:'image/jpeg'});if(up.error)throw up.error;screenshotPath=path;$('#ocrStatus').textContent='Reading scoreboard…';await loadOcr();if(window.Tesseract){const res=await window.Tesseract.recognize(blob,'eng',{logger:m=>{if(m.status==='recognizing text'){state.ocrProgress=Math.round((m.progress||0)*100);const bar=$('#ocrProgress');if(bar)bar.style.width=state.ocrProgress+'%';}}});ocrText=res.data.text||'';autoFillScores(ocrText,state.portal.players||[]);$('#ocrStatus').textContent='Screenshot read. Check every score before submitting.';}else{$('#ocrStatus').textContent='Screenshot uploaded. Automatic reading is unavailable; enter scores manually.';}}catch(err){$('#ocrStatus').textContent='Screenshot reading failed. Enter scores manually.';setToast(err.message||'Screenshot processing failed.');}};
   $('#confirmResultBtn').onclick=async()=>{const scores=$$('.scoreInput').map(i=>({player_id:i.dataset.playerId,player:i.dataset.playerName,kills:Number(i.value||0)}));const {error}=await supabase.rpc('submit_match_result',{p_match:state.portal.match_id,p_scores:scores,p_screenshot_path:screenshotPath||null,p_extracted:ocrText?{ocr_text:ocrText}:null,p_source:screenshotPath?'mixed':'manual'});if(error)return setToast(error.message);state.modal=null;setToast('Result submitted for admin approval.');await refreshAll();await openTournament(state.selectedTournament.id);};
 }
 function autoFillScores(text,players){const lines=text.split(/\n+/).map(x=>x.trim()).filter(Boolean);for(const p of players){const norm=p.gamertag.toLowerCase().replace(/[^a-z0-9]/g,'');let best='';for(const line of lines){const lnorm=line.toLowerCase().replace(/[^a-z0-9]/g,'');if(lnorm.includes(norm)||norm.includes(lnorm.slice(0,Math.min(norm.length,lnorm.length)))){best=line;break;}}if(best){const nums=best.match(/\b\d{1,3}\b/g)||[];if(nums.length){const input=$(`.scoreInput[data-player-id="${CSS.escape(p.user_id)}"]`);if(input)input.value=nums[0];}}}}
@@ -967,13 +853,7 @@ async function markNotificationsRead(){if(!state.session)return;const unread=sta
 
 async function requestBrowserNotifications(){if(!('Notification'in window))return setToast('Browser notifications are not supported here.');const p=await Notification.requestPermission();setToast(p==='granted'?'Browser notifications enabled.':'Notification permission was not enabled.');}
 
-async function autoUpdateProfiles(){
-  for(const [gamertag,picFile] of Object.entries(autoUpdateProfiles)){
-    const {data}=await supabase.from('profiles').select('id').ilike('gamertag',gamertag).maybeSingle();
-    if(data?.id){
-      await supabase.from('profiles').update({profile_picture:picFile,updated_at:new Date().toISOString()}).eq('id',data.id).catch(()=>{});
-    }
-  }
-}
-
 init().catch(err=>{console.error(err);$('#app').innerHTML=`<div class="boot"><img src="./icon-192.png"><div class="boot-title"><span>COMMUNITY ARENA</span><b>COULD NOT START</b></div><p style="max-width:420px;text-align:center;color:#9aa4a8">${esc(err.message||'Unknown error')}</p></div>`;});
+
+// Keep optional scoreboard OCR off the game launch path.
+async function loadOcr(){if(window.Tesseract)return;await new Promise(resolve=>{const script=document.createElement('script');script.src='https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';script.onload=resolve;script.onerror=resolve;document.head.append(script);setTimeout(resolve,8000);});}

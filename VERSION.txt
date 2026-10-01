@@ -1,3 +1,1 @@
-ZC2 Community Arena v5.9.0
-Build: mini-battle-art-boss-staging
-Base: v5.7.1 flat PWA + current v5.8 story/gameplay direction
+6.0.1-zombie-smash-enhanced
